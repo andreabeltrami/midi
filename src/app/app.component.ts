@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, OnInit, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import * as Tone from 'tone';
 
 @Component({
 	selector: 'app-root',
@@ -39,7 +40,7 @@ export class AppComponent {
 				chordTypeLabel = "7";
 				break;
 			case ChordType.Major7:
-				chordTypeLabel = "Maj7";
+				chordTypeLabel = " Maj7";
 				break;
 		}
 
@@ -49,8 +50,20 @@ export class AppComponent {
 	voicingStyle = signal<VoicingStyle>(VoicingStyle.Standard);
 	voicingOptions = Object.values(VoicingStyle);
 
-	constructor() {
-		navigator.requestMIDIAccess().then(this.onMidiAccess, this.onMidiFailure)
+	private sampler = new Tone.Sampler({
+		urls: {
+			"C4": "C4.mp3",
+			"D#4": "Ds4.mp3",
+			"F#4": "Fs4.mp3",
+			"A4": "A4.mp3",
+		},
+		release: 1,
+		baseUrl: "https://tonejs.github.io/audio/salamander/",
+	}).toDestination();
+
+	constructor(){
+		navigator.requestMIDIAccess().then(this.onMidiAccess, this.onMidiFailure);
+		Tone.start();
 	}
 
 	onMidiAccess = (midiAccess: MIDIAccess) => {
@@ -63,6 +76,8 @@ export class AppComponent {
 	onMIDIMessage = (event: MIDIMessageEvent): void => {
 		if (!event.data)
 			return;
+
+		this.handleMidiMessage(event.data[0], event.data[1], event.data[2]);
 
 		const eventType = event.data[0];
 		const rawNote = event.data[1];
@@ -83,6 +98,21 @@ export class AppComponent {
 			this.currentChord.set(AppComponent.generateRandomChord());
 		}
 
+	}
+
+	handleMidiMessage(status: number, noteId: number, velocity: number) {
+		const command = status & 0xf0;
+
+		const noteName = Tone.Frequency(noteId, "midi").toNote();
+
+		if (command === 0x90 && velocity > 0) {
+			// Note ON
+			this.sampler.triggerAttack(noteName, Tone.now(), velocity / 127);
+		}
+		else if (command === 0x80 || (command === 0x90 && velocity === 0)) {
+			// Note OFF
+			this.sampler.triggerRelease(noteName, Tone.now());
+		}
 	}
 
 	onVoicingChange(event: Event) {
@@ -119,11 +149,11 @@ export class AppComponent {
 			case ChordType.Minor7:
 				return resString === 'II,IIIm,V,VIIm'
 			case ChordType.Perfect7:
-				return resString === 
-					(this.voicingStyle()  === VoicingStyle.Standard ? 'II,IIIM,V,VIIm' : 'II,IIIM,VI,VIIm')
+				return resString ===
+					(this.voicingStyle() === VoicingStyle.Standard ? 'II,IIIM,V,VIIm' : 'II,IIIM,VI,VIIm')
 			case ChordType.Major7:
-				return resString === 
-					(this.voicingStyle()  === VoicingStyle.Standard ? 'II,IIIM,V,VIIM' : 'II,IIIM,V,VI')
+				return resString ===
+					(this.voicingStyle() === VoicingStyle.Standard ? 'II,IIIM,V,VIIM' : 'II,IIIM,V,VI')
 		}
 	}
 
@@ -144,8 +174,6 @@ export class AppComponent {
 		const randomIndex = Math.floor(Math.random() * values.length);
 		return values[randomIndex];
 	};
-
-
 }
 
 export type ChordDefinition = {
