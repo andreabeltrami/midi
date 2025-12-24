@@ -1,0 +1,42 @@
+.piano-container {
+  overflow-x: auto; /* Permette lo scroll se lo schermo è piccolo */
+  background: #222;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.piano-keyboard {
+  display: flex;
+  position: relative;
+  height: 80px; /* Altezza ridotta */
+  background: white;
+  width: fit-content;
+  border: 1px solid #000;
+}
+
+.key {
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  position: relative;
+}
+
+.white-key {
+  width: 15px; /* Molto stretto */
+  height: 100%;
+  background: white;
+  z-index: 1;
+}
+
+.black-key {
+  width: 10px;
+  height: 60%;
+  background: black;
+  margin-left: -5px; /* Centrato a cavallo tra due bianchi */
+  margin-right: -5px;
+  z-index: 2;
+  border: 1px solid #000;
+}
+
+.pressed {
+  background: #00adb5 !important; /* Colore acceso per visibilità */
+}
