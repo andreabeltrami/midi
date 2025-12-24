@@ -2,7 +2,7 @@ name: Deploy Angular to Pages
 
 on:
   push:
-    branches: ["master"]
+    branches: ["master"] # Assicurati che il tuo branch principale si chiami 'master' o 'main'
   workflow_dispatch:
 
 permissions:
@@ -31,8 +31,9 @@ jobs:
         run: npm ci
 
       - name: Build
-        # Sostituisci 'NOME_REPOS' con il nome del tuo progetto su GitHub
-        run: npx ng build --configuration production --base-href /NOME_REPOS/
+        # IMPORTANTE: --base-href deve corrispondere al nome del tuo repository GitHub
+        # Se il tuo repo si chiama "midi", lascia così. Se è diverso, cambialo.
+        run: npx ng build --configuration production --base-href /midi/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -40,7 +41,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/midi/browser # Verifica che il path sia questo dopo la build
+          # Angular 19 crea la cartella 'browser' dentro 'dist/nome-progetto'
+          path: dist/midi/browser
 
   deploy:
     environment:
