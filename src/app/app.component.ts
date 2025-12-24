@@ -25,7 +25,7 @@ export class AppComponent {
 			})
 		};
 	});
-	
+
 	pressedNotes = signal<Note[]>([]);
 	currentChordString = computed(() => {
 		const chord = this.currentChord();
@@ -46,13 +46,11 @@ export class AppComponent {
 		return `${NoteType[chord.baseNote]}${chordTypeLabel}`;
 	});
 
+	voicingStyle = signal<VoicingStyle>(VoicingStyle.Standard);
+	voicingOptions = Object.values(VoicingStyle);
+
 	constructor() {
-		this.generatePianoKeys();
 		navigator.requestMIDIAccess().then(this.onMidiAccess, this.onMidiFailure)
-	}
-
-	generatePianoKeys() {
-
 	}
 
 	onMidiAccess = (midiAccess: MIDIAccess) => {
@@ -79,13 +77,19 @@ export class AppComponent {
 			pressedNotes = this.pressedNotes().filter(x => x.name !== note.name);
 		}
 
-		this.pressedNotes.set([... pressedNotes]);
+		this.pressedNotes.set([...pressedNotes]);
 
-		if (this.isCurrentABillEvansChords()) {
+		if (this.checkChord()) {
 			this.currentChord.set(AppComponent.generateRandomChord());
 		}
 
 	}
+
+	onVoicingChange(event: Event) {
+		const value = (event.target as HTMLSelectElement).value as VoicingStyle;
+		this.voicingStyle.set(value);
+	}
+
 
 	onMidiFailure(reason: any) {
 
@@ -101,9 +105,9 @@ export class AppComponent {
 		}
 	}
 
-	isCurrentABillEvansChords(): boolean {
+	checkChord(): boolean {
 
-		if (this.pressedNotes.length !== 4)
+		if (this.pressedNotes().length !== 4)
 			return false;
 
 		const baseNote = new Note(this.currentChord().baseNote);
@@ -115,12 +119,14 @@ export class AppComponent {
 			case ChordType.Minor7:
 				return resString === 'II,IIIm,V,VIIm'
 			case ChordType.Perfect7:
-				return resString === 'II,IIIM,V,VIIm'
+				return resString === 
+					(this.voicingStyle()  === VoicingStyle.Standard ? 'II,IIIM,V,VIIm' : 'II,IIIM,VI,VIIm')
 			case ChordType.Major7:
-				return resString === 'II,IIIM,V,VIIM'
-
+				return resString === 
+					(this.voicingStyle()  === VoicingStyle.Standard ? 'II,IIIM,V,VIIM' : 'II,IIIM,V,VI')
 		}
 	}
+
 
 	static generateRandomChord(): ChordDefinition {
 		return {
@@ -176,6 +182,11 @@ export enum ChordType {
 	Minor7,
 	Perfect7,
 	Major7
+}
+
+export enum VoicingStyle {
+	Standard = 'Standard',
+	BillEvans = 'Bill Evans (Rootless)'
 }
 
 export enum NoteType {

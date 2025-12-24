@@ -1,14 +1,28 @@
-<h2>
-  {{currentChordString()}}
-</h2>
-<div class="piano-keyboard">
-  @for (pianoKey of allKeys; track pianoKey.note.originalNumber) {
-    <div 
-      class="key"
-      [class.black-key]="pianoKey.keyType === 'black'"
-      [class.white-key]="pianoKey.keyType === 'white'"
-      [class.pressed]="pianoKey.isPressed()">
+<div class="app-container">
+  <div class="chord-display">
+    <span class="chord-label">Target Chord</span>
+    <h2 class="chord-name">{{ currentChordString() }}</h2>
+    
+    <div class="selection-container">
+      <label for="voicing-select">Voicing Style:</label>
+      <select id="voicing-select" (change)="onVoicingChange($event)">
+        @for (option of voicingOptions; track option) {
+          <option [value]="option">{{ option }}</option>
+        }
+      </select>
     </div>
-  }
+  </div>
+
+  <div class="piano-container">
+    <div class="piano-keyboard">
+      @for (pianoKey of allKeys; track pianoKey.note.originalNumber) {
+        <div 
+          class="key"
+          [class.black-key]="pianoKey.keyType === 'black'"
+          [class.white-key]="pianoKey.keyType === 'white'"
+          [class.pressed]="pianoKey.isPressed()">
+        </div>
+      }
+    </div>
+  </div>
 </div>
-<router-outlet />

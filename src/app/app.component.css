@@ -1,42 +1,124 @@
+:host {
+  display: block;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: #1a1a1a;
+  color: white;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.chord-display {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.chord-label {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 0.7rem;
+  color: #888;
+}
+
+.chord-name {
+  font-size: 3.5rem;
+  margin: 0;
+  color: #00adb5;
+  text-shadow: 0 0 20px rgba(0, 173, 181, 0.3);
+}
+
 .piano-container {
-  overflow-x: auto; /* Permette lo scroll se lo schermo è piccolo */
-  background: #222;
-  padding: 10px;
-  border-radius: 4px;
+  background: #111;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 10px #000;
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
 }
 
 .piano-keyboard {
   display: flex;
   position: relative;
-  height: 80px; /* Altezza ridotta */
-  background: white;
-  width: fit-content;
-  border: 1px solid #000;
+  height: 120px; /* Un po' più alto per un look migliore */
+  background: #222;
+  padding: 5px;
+  border-radius: 4px;
 }
 
 .key {
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  position: relative;
+  transition: all 0.1s ease;
+  cursor: pointer;
 }
 
 .white-key {
-  width: 15px; /* Molto stretto */
+  width: 22px;
   height: 100%;
-  background: white;
+  background: linear-gradient(to bottom, #eee 0%, #fff 100%);
+  border-radius: 0 0 3px 3px;
+  margin: 1px;
   z-index: 1;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 .black-key {
-  width: 10px;
+  width: 14px;
   height: 60%;
-  background: black;
-  margin-left: -5px; /* Centrato a cavallo tra due bianchi */
-  margin-right: -5px;
+  background: linear-gradient(to bottom, #444 0%, #000 100%);
+  margin-left: -7px;
+  margin-right: -7px;
   z-index: 2;
-  border: 1px solid #000;
+  border-radius: 0 0 3px 3px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.5);
 }
 
-.pressed {
-  background: #00adb5 !important; /* Colore acceso per visibilità */
+/* Effetto di pressione Neon */
+.key.pressed {
+  background: #00adb5 !important;
+  box-shadow: 0 0 15px #00adb5, inset 0 0 10px rgba(255,255,255,0.5);
+  transform: translateY(2px);
+}
+
+/* Scrollbar personalizzata per il container */
+.piano-container::-webkit-scrollbar {
+  height: 8px;
+}
+.piano-container::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 10px;
+}
+
+.selection-container {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.selection-container label {
+  font-size: 0.8rem;
+  color: #888;
+  text-transform: uppercase;
+}
+
+select {
+  background: #2a2a2a;
+  color: #00adb5;
+  border: 1px solid #444;
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+select:hover {
+  border-color: #00adb5;
+  box-shadow: 0 0 10px rgba(0, 173, 181, 0.2);
+}
+
+select option {
+  background: #1a1a1a;
+  color: white;
 }
