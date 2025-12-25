@@ -17,6 +17,7 @@
     <div class="piano-keyboard">
       @for (pianoKey of allKeys; track pianoKey.note.originalNumber) {
         <div 
+          (click)="onPianoKeyPressed(pianoKey)"
           class="key"
           [class.black-key]="pianoKey.keyType === 'black'"
           [class.white-key]="pianoKey.keyType === 'white'"

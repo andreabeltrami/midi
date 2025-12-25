@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, OnInit, signal } from '@angular/core';
+import { Component, computed, OnInit, Signal, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import * as Tone from 'tone';
 
@@ -11,11 +11,8 @@ import * as Tone from 'tone';
 })
 export class AppComponent {
 
-	title = 'midi';
-
-	currentChord = signal<ChordDefinition>(AppComponent.generateRandomChord());
-
-	readonly allKeys = Array.from({ length: 89 }, (_, i) => {
+	readonly voicingOptions = Object.values(VoicingStyle);
+	readonly allKeys: PianoKey[] = Array.from({ length: 89 }, (_, i) => {
 		const blackNoteOffsets = [1, 3, 6, 8, 10];
 		const value = i + 24;
 		return {
@@ -27,7 +24,10 @@ export class AppComponent {
 		};
 	});
 
+	currentChord = signal<ChordDefinition>(AppComponent.generateRandomChord());
 	pressedNotes = signal<Note[]>([]);
+	voicingStyle = signal<VoicingStyle>(VoicingStyle.Standard);
+
 	currentChordString = computed(() => {
 		const chord = this.currentChord();
 		if (!chord) return '';
@@ -47,8 +47,7 @@ export class AppComponent {
 		return `${NoteType[chord.baseNote]}${chordTypeLabel}`;
 	});
 
-	voicingStyle = signal<VoicingStyle>(VoicingStyle.Standard);
-	voicingOptions = Object.values(VoicingStyle);
+
 
 	private sampler = new Tone.Sampler({
 		urls: {
@@ -61,7 +60,7 @@ export class AppComponent {
 		baseUrl: "https://tonejs.github.io/audio/salamander/",
 	}).toDestination();
 
-	constructor(){
+	constructor() {
 		navigator.requestMIDIAccess().then(this.onMidiAccess, this.onMidiFailure);
 		Tone.start();
 	}
@@ -76,11 +75,13 @@ export class AppComponent {
 	onMIDIMessage = (event: MIDIMessageEvent): void => {
 		if (!event.data)
 			return;
+	}
 
-		this.handleMidiMessage(event.data[0], event.data[1], event.data[2]);
+	handleNote(status: number, noteId: number, velocity: number) {
+		this.playSound(status, noteId, velocity);
 
-		const eventType = event.data[0];
-		const rawNote = event.data[1];
+		const eventType = status;
+		const rawNote = noteId;
 
 		let pressedNotes = this.pressedNotes();
 
@@ -97,20 +98,16 @@ export class AppComponent {
 		if (this.checkChord()) {
 			this.currentChord.set(AppComponent.generateRandomChord());
 		}
-
 	}
 
-	handleMidiMessage(status: number, noteId: number, velocity: number) {
+	playSound(status: number, noteId: number, velocity: number) {
 		const command = status & 0xf0;
-
 		const noteName = Tone.Frequency(noteId, "midi").toNote();
 
 		if (command === 0x90 && velocity > 0) {
-			// Note ON
 			this.sampler.triggerAttack(noteName, Tone.now(), velocity / 127);
 		}
 		else if (command === 0x80 || (command === 0x90 && velocity === 0)) {
-			// Note OFF
 			this.sampler.triggerRelease(noteName, Tone.now());
 		}
 	}
@@ -120,6 +117,12 @@ export class AppComponent {
 		this.voicingStyle.set(value);
 	}
 
+	onPianoKeyPressed(pianoKey: PianoKey) {
+		this.handleNote(MidiEventType.Pressed, pianoKey.note.originalNumber, 127);
+		setTimeout(() => {
+			this.handleNote(MidiEventType.Released, pianoKey.note.originalNumber, 127);
+		}, 500);		
+	}
 
 	onMidiFailure(reason: any) {
 
@@ -182,7 +185,6 @@ export type ChordDefinition = {
 }
 
 
-
 export class Note {
 	type: NoteType;
 	originalNumber: number;
@@ -202,7 +204,7 @@ export class Note {
 
 export interface PianoKey {
 	note: Note;
-	isPressed: boolean;
+	isPressed: Signal<boolean>;
 	keyType: "white" | "black";
 }
 
