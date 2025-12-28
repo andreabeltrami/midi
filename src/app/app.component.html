@@ -1,8 +1,13 @@
 <div class="app-container">
   <div class="chord-display">
     <span class="chord-label">Target Chord</span>
-    <h2 class="chord-name">{{ currentChordString() }}</h2>
-    
+    <h2 class="chord-name"
+       [class.wrong]='currentChordWrong()'
+       [class.correct]='currentChordCorrect()'
+    >
+      {{ currentChordString() }}
+    </h2>
+
     <div class="selection-container">
       <button (click)="resetPressedNotes()">Reset</button>
       <label for="voicing-select">Voicing Style:</label>

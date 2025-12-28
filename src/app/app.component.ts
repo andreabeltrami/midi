@@ -31,7 +31,11 @@ export class AppComponent {
 		};
 	});
 
+	
 	currentChord = signal<ChordDefinition>(AppComponent.generateRandomChord());
+	currentChordWrong = signal<boolean>(false);
+	currentChordCorrect = signal<boolean>(false);
+
 	pressedNotes = signal<Note[]>([]);
 	voicingStyle = signal<VoicingStyle>(VoicingStyle.Standard);
 
@@ -54,21 +58,24 @@ export class AppComponent {
 		return `${NoteType[chord.baseNote]}${chordTypeLabel}`;
 	});
 
-	private sampler = new Tone.Sampler({
-		urls: {
-			"C4": "C4.mp3",
-			"D#4": "Ds4.mp3",
-			"F#4": "Fs4.mp3",
-			"A4": "A4.mp3",
-		},
-		release: 1,
-		baseUrl: "https://tonejs.github.io/audio/salamander/",
-	}).toDestination();
+	lastMidiEventType = MidiEventType.Released;
+	sampler: Tone.Sampler;
 
 	constructor() {
 		navigator.requestMIDIAccess().then(this.onMidiAccess, (x) => {
 			console.error(x);
 		});
+
+		this.sampler = new Tone.Sampler({
+			urls: {
+				"C4": "C4.mp3",
+				"D#4": "Ds4.mp3",
+				"F#4": "Fs4.mp3",
+				"A4": "A4.mp3",
+			},
+			release: 1,
+			baseUrl: "https://tonejs.github.io/audio/salamander/",
+		}).toDestination();
 		Tone.start();
 	}
 
@@ -112,7 +119,7 @@ export class AppComponent {
 		const rawNote = noteId;
 
 		let pressedNotes = this.pressedNotes();
-
+		this.lastMidiEventType = eventType;
 		if (eventType === MidiEventType.Pressed) {
 			pressedNotes.push(new Note(rawNote));
 		}
@@ -120,11 +127,23 @@ export class AppComponent {
 			const note = new Note(rawNote)
 			pressedNotes = this.pressedNotes().filter(x => x.name !== note.name);
 		}
-
 		this.pressedNotes.set([...pressedNotes]);
 
-		if (this.checkChord()) {
-			this.generateNewChord();
+		if (this.needCheckChord()) {
+			if (this.checkChord()) {
+				this.currentChordCorrect.set(true);
+				setTimeout(() => {
+					this.currentChordCorrect.set(false);
+					this.generateNewChord();
+				}, 500);
+
+			}
+			else {
+				this.currentChordWrong.set(true);
+				setTimeout(() => {
+					this.currentChordWrong.set(false);
+				}, 500);
+			}
 		}
 	}
 
@@ -159,15 +178,20 @@ export class AppComponent {
 		}
 	}
 
-	private checkChord(): boolean {
-
+	private needCheckChord(): boolean {
 		if (this.pressedNotes().length !== 4)
 			return false;
 
+		if(this.lastMidiEventType !== MidiEventType.Pressed)
+			return false;
+
+		return true;
+	}
+
+	private checkChord(): boolean {
 		const baseNote = new Note(this.currentChord().baseNote);
 		const result: Interval[] = this.pressedNotes().map(x => this.getInterval(baseNote, x));
 		const resString = result.sort((a, b) => a - b).map(i => Interval[i]).join(',');
-		console.log(resString);
 
 		switch (this.currentChord().type) {
 			case ChordType.Minor7:
