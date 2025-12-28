@@ -1,11 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, OnInit, Signal, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, computed, Signal, signal } from '@angular/core';
 import * as Tone from 'tone';
+import { ChordType } from './enums/chord-type';
+import { Interval } from './enums/interval';
+import { MidiEventType } from './enums/midi-event-type';
+import { NoteType } from './enums/note-type';
+import { VoicingStyle } from './enums/voicing-style';
+import { ChordDefinition } from './types/chord-definition';
+import { PianoKey } from './types/piano-key';
+import { Note } from './types/note';
 
 @Component({
 	selector: 'app-root',
-	imports: [RouterOutlet, CommonModule],
+	imports: [CommonModule],
 	templateUrl: './app.component.html',
 	styleUrl: './app.component.css'
 })
@@ -47,8 +54,6 @@ export class AppComponent {
 		return `${NoteType[chord.baseNote]}${chordTypeLabel}`;
 	});
 
-
-
 	private sampler = new Tone.Sampler({
 		urls: {
 			"C4": "C4.mp3",
@@ -61,23 +66,46 @@ export class AppComponent {
 	}).toDestination();
 
 	constructor() {
-		navigator.requestMIDIAccess().then(this.onMidiAccess, this.onMidiFailure);
+		navigator.requestMIDIAccess().then(this.onMidiAccess, (x) => {
+			console.error(x);
+		});
 		Tone.start();
 	}
 
-	onMidiAccess = (midiAccess: MIDIAccess) => {
+	public onVoicingChange(event: Event) {
+		const value = (event.target as HTMLSelectElement).value as VoicingStyle;
+		this.voicingStyle.set(value);
+	}
+
+	public onPianoKeyPressed(pianoKey: PianoKey) {
+		if (pianoKey.isPressed()) {
+			this.handleNote(MidiEventType.Released, pianoKey.note.originalNumber, 127);
+		}
+		else {
+			this.handleNote(MidiEventType.Pressed, pianoKey.note.originalNumber, 127);
+		}
+	}
+
+	public resetPressedNotes() {
+		this.pressedNotes().forEach(x => {
+			this.handleNote(MidiEventType.Released, x.originalNumber, 127);
+		})
+	}
+
+	private onMidiAccess = (midiAccess: MIDIAccess) => {
 		const midiInput = midiAccess.inputs.get("input-0");
 		if (midiInput) {
 			midiInput.onmidimessage = this.onMIDIMessage;
 		}
 	}
 
-	onMIDIMessage = (event: MIDIMessageEvent): void => {
+	private onMIDIMessage = (event: MIDIMessageEvent): void => {
 		if (!event.data)
 			return;
+		this.handleNote(event.data[0], event.data[1], event.data[2]);
 	}
 
-	handleNote(status: number, noteId: number, velocity: number) {
+	private handleNote(status: number, noteId: number, velocity: number) {
 		this.playSound(status, noteId, velocity);
 
 		const eventType = status;
@@ -96,17 +124,20 @@ export class AppComponent {
 		this.pressedNotes.set([...pressedNotes]);
 
 		if (this.checkChord()) {
-			let newChord = AppComponent.generateRandomChord()
-			while(newChord.baseNote === this.currentChord().baseNote && newChord.type === this.currentChord().type){
-				newChord = AppComponent.generateRandomChord();
-			}
-
-			this.currentChord.set(newChord);
-			
+			this.generateNewChord();
 		}
 	}
 
-	playSound(status: number, noteId: number, velocity: number) {
+	private generateNewChord() {
+		let newChord = AppComponent.generateRandomChord();
+		while (newChord.baseNote === this.currentChord().baseNote && newChord.type === this.currentChord().type) {
+			newChord = AppComponent.generateRandomChord();
+		}
+
+		this.currentChord.set(newChord);
+	}
+
+	private playSound(status: number, noteId: number, velocity: number) {
 		const command = status & 0xf0;
 		const noteName = Tone.Frequency(noteId, "midi").toNote();
 
@@ -118,25 +149,7 @@ export class AppComponent {
 		}
 	}
 
-	onVoicingChange(event: Event) {
-		const value = (event.target as HTMLSelectElement).value as VoicingStyle;
-		this.voicingStyle.set(value);
-	}
-
-	onPianoKeyPressed(pianoKey: PianoKey) {
-		if(pianoKey.isPressed()){
-			this.handleNote(MidiEventType.Released, pianoKey.note.originalNumber, 127);
-		}	
-		else{
-			this.handleNote(MidiEventType.Pressed, pianoKey.note.originalNumber, 127);
-		}	
-	}
-
-	onMidiFailure(reason: any) {
-
-	}
-
-	getInterval(baseNote: Note, arrivalNote: Note): Interval {
+	private getInterval(baseNote: Note, arrivalNote: Note): Interval {
 
 		if (arrivalNote.type >= baseNote.type) {
 			return arrivalNote.type - baseNote.type;
@@ -146,7 +159,7 @@ export class AppComponent {
 		}
 	}
 
-	checkChord(): boolean {
+	private checkChord(): boolean {
 
 		if (this.pressedNotes().length !== 4)
 			return false;
@@ -168,13 +181,6 @@ export class AppComponent {
 		}
 	}
 
-	resetPressedNotes(){
-		this.pressedNotes().forEach(x => {
-			this.handleNote(MidiEventType.Released, x.originalNumber, 127);
-		})
-	}
-
-
 	static generateRandomChord(): ChordDefinition {
 		return {
 			baseNote: AppComponent.getRandomEnumValue(NoteType),
@@ -191,68 +197,4 @@ export class AppComponent {
 		const randomIndex = Math.floor(Math.random() * values.length);
 		return values[randomIndex];
 	};
-}
-
-export type ChordDefinition = {
-	baseNote: NoteType;
-	type: ChordType;
-}
-
-
-export class Note {
-	type: NoteType;
-	originalNumber: number;
-	name: string;
-
-	constructor(number: number) {
-		this.originalNumber = number;
-		this.type = (number % 12);
-		this.name = `${NoteType[this.type]}${Math.floor(this.originalNumber / 12)}`
-	}
-
-	toString(): string {
-		return this.name;
-	}
-
-}
-
-export interface PianoKey {
-	note: Note;
-	isPressed: Signal<boolean>;
-	keyType: "white" | "black";
-}
-
-export enum ChordType {
-	Minor7,
-	Perfect7,
-	Major7
-}
-
-export enum VoicingStyle {
-	Standard = 'Standard',
-	BillEvans = 'Bill Evans (Rootless)'
-}
-
-export enum NoteType {
-	C, Db, D, Eb, E, F, Gb, G, Ab, A, Bb, B
-}
-
-export enum Interval {
-	I = 0,
-	IIb = 1,
-	II = 2,
-	IIIm = 3,
-	IIIM = 4,
-	IV = 5,
-	Vb = 6,
-	V = 7,
-	VIb = 8,
-	VI = 9,
-	VIIm = 10,
-	VIIM = 11
-}
-
-export enum MidiEventType {
-	Pressed = 144,
-	Released = 128,
 }
