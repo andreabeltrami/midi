@@ -96,7 +96,13 @@ export class AppComponent {
 		this.pressedNotes.set([...pressedNotes]);
 
 		if (this.checkChord()) {
-			this.currentChord.set(AppComponent.generateRandomChord());
+			let newChord = AppComponent.generateRandomChord()
+			while(newChord.baseNote === this.currentChord().baseNote && newChord.type === this.currentChord().type){
+				newChord = AppComponent.generateRandomChord();
+			}
+
+			this.currentChord.set(newChord);
+			
 		}
 	}
 
@@ -118,10 +124,12 @@ export class AppComponent {
 	}
 
 	onPianoKeyPressed(pianoKey: PianoKey) {
-		this.handleNote(MidiEventType.Pressed, pianoKey.note.originalNumber, 127);
-		setTimeout(() => {
+		if(pianoKey.isPressed()){
 			this.handleNote(MidiEventType.Released, pianoKey.note.originalNumber, 127);
-		}, 500);		
+		}	
+		else{
+			this.handleNote(MidiEventType.Pressed, pianoKey.note.originalNumber, 127);
+		}	
 	}
 
 	onMidiFailure(reason: any) {
@@ -158,6 +166,12 @@ export class AppComponent {
 				return resString ===
 					(this.voicingStyle() === VoicingStyle.Standard ? 'II,IIIM,V,VIIM' : 'II,IIIM,V,VI')
 		}
+	}
+
+	resetPressedNotes(){
+		this.pressedNotes().forEach(x => {
+			this.handleNote(MidiEventType.Released, x.originalNumber, 127);
+		})
 	}
 
 

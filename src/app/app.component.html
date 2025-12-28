@@ -4,6 +4,7 @@
     <h2 class="chord-name">{{ currentChordString() }}</h2>
     
     <div class="selection-container">
+      <button (click)="resetPressedNotes()">Reset</button>
       <label for="voicing-select">Voicing Style:</label>
       <select id="voicing-select" (change)="onVoicingChange($event)">
         @for (option of voicingOptions; track option) {
