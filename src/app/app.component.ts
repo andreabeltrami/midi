@@ -31,7 +31,7 @@ export class AppComponent {
 		};
 	});
 
-	
+
 	currentChord = signal<ChordDefinition>(AppComponent.generateRandomChord());
 	currentChordWrong = signal<boolean>(false);
 	currentChordCorrect = signal<boolean>(false);
@@ -59,24 +59,37 @@ export class AppComponent {
 	});
 
 	lastMidiEventType = MidiEventType.Released;
-	sampler: Tone.Sampler;
+	sampler?: Tone.Sampler;
 
 	constructor() {
-		navigator.requestMIDIAccess().then(this.onMidiAccess, (x) => {
-			console.error(x);
-		});
 
-		this.sampler = new Tone.Sampler({
-			urls: {
-				"C4": "C4.mp3",
-				"D#4": "Ds4.mp3",
-				"F#4": "Fs4.mp3",
-				"A4": "A4.mp3",
-			},
-			release: 1,
-			baseUrl: "https://tonejs.github.io/audio/salamander/",
-		}).toDestination();
-		Tone.start();
+		try {
+			navigator.requestMIDIAccess().then(this.onMidiAccess, (x) => {
+				console.error(x);
+			});
+		}
+		catch (e) {
+			console.error(e);
+		}
+
+		try {
+
+			this.sampler = new Tone.Sampler({
+				urls: {
+					"C4": "C4.mp3",
+					"D#4": "Ds4.mp3",
+					"F#4": "Fs4.mp3",
+					"A4": "A4.mp3",
+				},
+				release: 1,
+				baseUrl: "https://tonejs.github.io/audio/salamander/",
+			}).toDestination();
+			Tone.start();
+		}
+		catch (e) {
+			console.error(e);
+		}
+
 	}
 
 	public onVoicingChange(event: Event) {
@@ -157,6 +170,10 @@ export class AppComponent {
 	}
 
 	private playSound(status: number, noteId: number, velocity: number) {
+
+		if (!this.sampler)
+			return;
+		
 		const command = status & 0xf0;
 		const noteName = Tone.Frequency(noteId, "midi").toNote();
 
@@ -182,7 +199,7 @@ export class AppComponent {
 		if (this.pressedNotes().length !== 4)
 			return false;
 
-		if(this.lastMidiEventType !== MidiEventType.Pressed)
+		if (this.lastMidiEventType !== MidiEventType.Pressed)
 			return false;
 
 		return true;
