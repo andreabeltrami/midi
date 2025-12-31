@@ -1,130 +1,175 @@
 :host {
   display: block;
-  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  background-color: #1a1a1a;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #0f0f0f;
   color: white;
   min-height: 100vh;
-  padding: 2rem;
+  padding: 1rem;
+}
+
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .chord-display {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
+  padding-top: 1rem;
 }
 
 .chord-label {
   text-transform: uppercase;
-  letter-spacing: 2px;
-  font-size: 0.7rem;
-  color: #888;
+  letter-spacing: 3px;
+  font-size: 0.65rem;
+  color: #666;
+  display: block;
+  margin-bottom: 0.5rem;
 }
 
 .chord-name {
-  font-size: 3.5rem;
-  margin: 0;
-  color: #ffffff;
-  text-shadow: 0 0 20px rgba(0, 173, 181, 0.3);
-  &.wrong{
-    color: #b50000;
+  font-size: clamp(2.5rem, 10vw, 4rem);
+  margin: 0.5rem 0;
+  font-weight: 800;
+  transition: color 0.3s ease;
+  
+  &.wrong { color: #ff4d4d; text-shadow: 0 0 20px rgba(255, 77, 77, 0.4); }
+  &.correct { color: #00ff88; text-shadow: 0 0 20px rgba(0, 255, 136, 0.4); }
+}
+
+/* Styling Reset Button */
+.reset-btn {
+  background: transparent;
+  border: 1px solid #444;
+  color: #eee;
+  padding: 8px 20px;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  margin-bottom: 1rem;
+
+  &:hover {
+    border-color: #00adb5;
+    color: #00adb5;
+    background: rgba(0, 173, 181, 0.05);
   }
-  &.correct{
-    color: #07cc07;
+
+  &:active { transform: scale(0.95); }
+
+  .icon { font-size: 1.1rem; }
+}
+
+.selection-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.select-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  
+  label {
+    font-size: 0.7rem;
+    color: #555;
+    text-transform: uppercase;
+    font-weight: bold;
   }
 }
 
+select {
+  background: #1a1a1a;
+  color: #00adb5;
+  border: 1px solid #333;
+  padding: 10px 15px;
+  border-radius: 8px;
+  outline: none;
+  min-width: 180px;
+}
+
+/* Piano Section & Responsiveness */
 .piano-container {
-  background: #111;
-  padding: 30px;
-  border-radius: 15px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 10px #000;
+  background: #0a0a0a;
+  padding: 20px 10px;
+  border-radius: 20px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   overflow-x: auto;
+  border: 1px solid #222;
+  
+  /* Nasconde scrollbar ma permette scroll */
+  -webkit-overflow-scrolling: touch;
+  &::-webkit-scrollbar { height: 6px; }
+  &::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
 }
 
 .piano-keyboard {
   display: flex;
   position: relative;
-  height: 120px; /* Un po' più alto per un look migliore */
-  background: #222;
-  padding: 5px;
-  border-radius: 4px;
+  height: 180px; 
+  margin: 0 auto;
+  padding-bottom: 5px;
 }
 
-.key {
-  transition: all 0.1s ease;
+.key{
   cursor: pointer;
 }
 
 .white-key {
-  width: 22px;
+  width: 35px;
   height: 100%;
-  background: linear-gradient(to bottom, #eee 0%, #fff 100%);
-  border-radius: 0 0 3px 3px;
-  margin: 1px;
+  background: linear-gradient(to bottom, #fff 0%, #f0f0f0 100%);
+  /* Bordo laterale e inferiore per dare profondità */
+  border: 1px solid #ccc;
+  border-bottom: 4px solid #bbb; 
+  border-radius: 0 0 5px 5px;
+  margin-right: -1px;
   z-index: 1;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-sizing: border-box;
 }
 
 .black-key {
-  width: 14px;
+  width: 22px;
   height: 60%;
   background: linear-gradient(to bottom, #444 0%, #000 100%);
-  margin-left: -7px;
-  margin-right: -7px;
+  /* Bordo leggermente più chiaro del nero per visibilità */
+  border: 1px solid #222;
+  border-bottom: 3px solid #000;
+  margin-left: -11px;
+  margin-right: -11px;
   z-index: 2;
   border-radius: 0 0 3px 3px;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.5);
+  box-sizing: border-box;
 }
 
-/* Effetto di pressione Neon */
 .key.pressed {
   background: #00adb5 !important;
-  box-shadow: 0 0 15px #00adb5, inset 0 0 10px rgba(255,255,255,0.5);
+  /* Riduciamo il bordo inferiore quando premuto per simulare la pressione */
+  border-bottom-width: 1px;
+  box-shadow: 0 0 20px #00adb5, inset 0 0 10px rgba(255,255,255,0.3);
   transform: translateY(2px);
-}
-
-/* Scrollbar personalizzata per il container */
-.piano-container::-webkit-scrollbar {
-  height: 8px;
-}
-.piano-container::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 10px;
-}
-
-.selection-container {
-  margin-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-.selection-container label {
-  font-size: 0.8rem;
-  color: #888;
-  text-transform: uppercase;
-}
-
-select {
-  background: #2a2a2a;
-  color: #00adb5;
-  border: 1px solid #444;
-  padding: 8px 15px;
-  border-radius: 5px;
-  font-family: inherit;
-  outline: none;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-select:hover {
   border-color: #00adb5;
-  box-shadow: 0 0 10px rgba(0, 173, 181, 0.2);
 }
 
-select option {
-  background: #1a1a1a;
-  color: white;
+/* Mobile Adjustments */
+@media (max-width: 600px) {
+  :host { padding: 0.5rem; }
+  
+  .piano-keyboard { height: 140px; }
+  
+  .white-key { 
+    width: 30px;
+    border-bottom-width: 3px; 
+  }
+  
+  .black-key { width: 18px; margin-left: -9px; margin-right: -9px; }
+  
+  .chord-display { margin-bottom: 1rem; }
 }

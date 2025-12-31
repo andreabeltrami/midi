@@ -2,20 +2,24 @@
   <div class="chord-display">
     <span class="chord-label">Target Chord</span>
     <h2 class="chord-name"
-       [class.wrong]='currentChordWrong()'
-       [class.correct]='currentChordCorrect()'
-    >
+        [class.wrong]='currentChordWrong()'
+        [class.correct]='currentChordCorrect()'>
       {{ currentChordString() }}
     </h2>
 
     <div class="selection-container">
-      <button (click)="resetPressedNotes()">Reset</button>
-      <label for="voicing-select">Voicing Style:</label>
-      <select id="voicing-select" (change)="onVoicingChange($event)">
-        @for (option of voicingOptions; track option) {
-          <option [value]="option">{{ option }}</option>
-        }
-      </select>
+      <button class="reset-btn" (click)="resetPressedNotes()">
+        <span class="icon">↺</span> Reset
+      </button>
+      
+      <div class="select-wrapper">
+        <label for="voicing-select">Voicing Style</label>
+        <select id="voicing-select" (change)="onVoicingChange($event)">
+          @for (option of voicingOptions; track option) {
+            <option [value]="option">{{ option }}</option>
+          }
+        </select>
+      </div>
     </div>
   </div>
 
