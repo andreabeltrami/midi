@@ -128,7 +128,7 @@ export class AppComponent {
 	private handleNote(status: number, noteId: number, velocity: number) {
 		this.playSound(status, noteId, velocity);
 
-		const eventType = status;
+		const eventType = velocity === 0 ? MidiEventType.Released : status;
 		const rawNote = noteId;
 
 		let pressedNotes = this.pressedNotes();
