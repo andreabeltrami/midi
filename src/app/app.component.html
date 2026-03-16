@@ -1,39 +1,61 @@
-<div class="app-container">
-  <div class="chord-display">
-    <span class="chord-label">Target Chord</span>
-    <h2 class="chord-name"
-        [class.wrong]='currentChordWrong()'
-        [class.correct]='currentChordCorrect()'>
-      {{ currentChordString() }}
-    </h2>
-
-    <div class="selection-container">
-      <button class="reset-btn" (click)="resetPressedNotes()">
-        <span class="icon">↺</span> Reset
-      </button>
-      
-      <div class="select-wrapper">
-        <label for="voicing-select">Voicing Style</label>
-        <select id="voicing-select" (change)="onVoicingChange($event)">
-          @for (option of voicingOptions; track option) {
-            <option [value]="option">{{ option }}</option>
+<div
+  class="shell"
+  [class.mode-selected]="selectedMode() !== null"
+  [class.menu-collapsed]="selectedMode() !== null && menuCollapsed()">
+  <aside class="mode-picker">
+    <div class="mode-picker-inner">
+      @if (selectedMode() !== null) {
+        <button class="menu-toggle" (click)="toggleMenu()">
+          <span>☰</span>
+          @if (!menuCollapsed()) {
+            <span>Menu</span>
           }
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <div class="piano-container">
-    <div class="piano-keyboard">
-      @for (pianoKey of allKeys; track pianoKey.note.originalNumber) {
-        <div 
-          (click)="onPianoKeyPressed(pianoKey)"
-          class="key"
-          [class.black-key]="pianoKey.keyType === 'black'"
-          [class.white-key]="pianoKey.keyType === 'white'"
-          [class.pressed]="pianoKey.isPressed()">
-        </div>
+        </button>
       }
+
+      <p class="eyebrow">Mini Games</p>
+      <h1>MIDI Trainer</h1>
+      <p class="description">
+        Scegli una modalità e continua a cambiarla dal menu laterale.
+      </p>
+
+      <button
+        class="mode-button"
+        [class.compact]="selectedMode() !== null"
+        [class.active]="selectedMode() === 'play'"
+        [attr.aria-label]="menuCollapsed() ? 'Play Chord' : null"
+        (click)="selectMode('play')">
+        <span class="mode-icon" aria-hidden="true">&#127929;</span>
+        <span class="mode-title">Play Chord</span>
+        @if (!(selectedMode() !== null && menuCollapsed())) {
+          <span class="mode-copy">Suona l'accordo richiesto sulla tastiera</span>
+        }
+      </button>
+
+      <button
+        class="mode-button"
+        [class.compact]="selectedMode() !== null"
+        [class.active]="selectedMode() === 'recognize'"
+        [attr.aria-label]="menuCollapsed() ? 'Recognize Chord' : null"
+        (click)="selectMode('recognize')">
+        <span class="mode-icon" aria-hidden="true">&#127911;</span>
+        <span class="mode-title">Recognize Chord</span>
+        @if (!(selectedMode() !== null && menuCollapsed())) {
+          <span class="mode-copy">Guarda il voicing e indovina accordo e qualita</span>
+        }
+      </button>
     </div>
-  </div>
+  </aside>
+
+  <main class="stage">
+    @if (selectedMode() === 'play') {
+      <app-play-chord></app-play-chord>
+    } @else if (selectedMode() === 'recognize') {
+      <app-recognize-chord></app-recognize-chord>
+    } @else {
+      <section class="welcome-panel">
+        <h2>Scegli una modalità per iniziare</h2>
+      </section>
+    }
+  </main>
 </div>

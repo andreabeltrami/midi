@@ -1,0 +1,13 @@
+<div class="piano-container">
+    <div class="piano-keyboard">
+      @for (pianoKey of keyboardService.allKeys; track pianoKey.note.originalNumber) {
+        <div 
+          (click)="onPianoKeyPressed(pianoKey)"
+          class="key"
+          [class.black-key]="pianoKey.keyType === 'black'"
+          [class.white-key]="pianoKey.keyType === 'white'"
+          [class.pressed]="pianoKey.isPressed()">
+        </div>
+      }
+    </div>
+  </div>
