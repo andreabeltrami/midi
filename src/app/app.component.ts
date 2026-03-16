@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, computed, Signal, signal } from '@angular/core';
 import * as Tone from 'tone';
 import { ChordType } from './enums/chord-type';
@@ -12,7 +12,7 @@ import { Note } from './types/note';
 
 @Component({
 	selector: 'app-root',
-	imports: [CommonModule],
+	imports: [],
 	templateUrl: './app.component.html',
 	styleUrl: './app.component.css'
 })
