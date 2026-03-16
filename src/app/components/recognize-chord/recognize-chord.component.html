@@ -1,17 +1,47 @@
 <div class="app-container">
   <div class="chord-display">
-    <span class="chord-label">Target Chord</span>
-    <h2 class="chord-name"
-        [class.wrong]='currentChordWrong()'
-        [class.correct]='currentChordCorrect()'>
-      {{ currentChordString() }}
+    <span class="chord-label">Recognize Chord</span>
+
+    <h2
+      class="chord-name hidden-target"
+      [class.wrong]="currentChordWrong()"
+      [class.correct]="currentChordCorrect()">
+      @if (currentChordCorrect()) {
+        Corretto
+      } @else if (currentChordWrong()) {
+        Riprova
+      } @else {
+        Accordo nascosto
+      }
     </h2>
+
+    <div class="guess-panel">
+      <div class="select-wrapper">
+        <label for="base-note-select">Base</label>
+        <select id="base-note-select" (change)="onBaseNoteChange($event)">
+          @for (option of noteOptions; track option.value) {
+            <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="select-wrapper">
+        <label for="quality-select">Qualità</label>
+        <select id="quality-select" (change)="onChordTypeChange($event)">
+          @for (option of chordTypeOptions; track option.value) {
+            <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </div>
+
+      <button class="confirm-btn" (click)="submitGuess()">OK</button>
+    </div>
 
     <div class="selection-container">
       <button class="reset-btn" (click)="changeChord()">
         <span class="icon">↺</span> Cambia Accordo
       </button>
-      
+
       <div class="select-wrapper">
         <label for="voicing-select">Voicing Style</label>
         <select id="voicing-select" (change)="onVoicingChange($event)">

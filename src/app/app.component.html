@@ -1,1 +1,39 @@
-<app-recognize-chord>
+<div class="shell" [class.mode-selected]="selectedMode() !== null">
+  <aside class="mode-picker">
+    <div class="mode-picker-inner">
+      <p class="eyebrow">Mini Games</p>
+      <h1>MIDI Trainer</h1>
+      <p class="description">
+        Scegli una modalità e continua a cambiarla dal menu laterale.
+      </p>
+
+      <button
+        class="mode-button"
+        [class.active]="selectedMode() === 'play'"
+        (click)="selectMode('play')">
+        <span class="mode-title">Play Chord</span>
+        <span class="mode-copy">Suona l’accordo richiesto sulla tastiera</span>
+      </button>
+
+      <button
+        class="mode-button"
+        [class.active]="selectedMode() === 'recognize'"
+        (click)="selectMode('recognize')">
+        <span class="mode-title">Recognize Chord</span>
+        <span class="mode-copy">Guarda il voicing e indovina accordo e qualità</span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="stage">
+    @if (selectedMode() === 'play') {
+      <app-play-chord></app-play-chord>
+    } @else if (selectedMode() === 'recognize') {
+      <app-recognize-chord></app-recognize-chord>
+    } @else {
+      <section class="welcome-panel">
+        <h2>Scegli una modalità per iniziare</h2>
+      </section>
+    }
+  </main>
+</div>

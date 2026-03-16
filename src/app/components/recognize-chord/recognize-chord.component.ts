@@ -1,17 +1,13 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { ChordType } from '../../enums/chord-type';
 import { Interval } from '../../enums/interval';
-import { MidiEventType } from '../../enums/midi-event-type';
 import { NoteType } from '../../enums/note-type';
 import { VoicingStyle } from '../../enums/voicing-style';
 import { ChordDefinition } from '../../types/chord-definition';
 import { Note } from '../../types/note';
-import { PianoKey } from '../../types/piano-key';
 import { PlayChordComponent } from '../play-chord/play-chord.component';
-import * as Tone from 'tone';
-import { KeyboardComponentComponent } from "../keyboard-component/keyboard-component.component";
+import { KeyboardComponentComponent } from '../keyboard-component/keyboard-component.component';
 import { KeyboardService } from '../../services/keyboard.service';
-
 
 @Component({
   selector: 'app-recognize-chord',
@@ -20,48 +16,77 @@ import { KeyboardService } from '../../services/keyboard.service';
   styleUrl: './recognize-chord.component.css',
 })
 export class RecognizeChordComponent {
-
   readonly voicingOptions = Object.values(VoicingStyle);
 
+  readonly noteOptions = Object.keys(NoteType)
+    .filter((key) => isNaN(Number(key)))
+    .map((label) => ({
+      label,
+      value: NoteType[label as keyof typeof NoteType] as NoteType,
+    }));
+
+  readonly chordTypeOptions = [
+    { label: '-7', value: ChordType.Minor7 },
+    { label: '7', value: ChordType.Perfect7 },
+    { label: 'Maj7', value: ChordType.Major7 },
+  ];
+
   currentChord = signal<ChordDefinition>(PlayChordComponent.generateRandomChord());
-  currentChordWrong = signal<boolean>(false);
-  currentChordCorrect = signal<boolean>(false);
+  currentChordWrong = signal(false);
+  currentChordCorrect = signal(false);
   voicingStyle = signal<VoicingStyle>(VoicingStyle.Standard);
 
-  currentChordString = computed(() => {
-    const chord = this.currentChord();
-    if (!chord) return '';
-    let chordTypeLabel = "";
-    switch (chord.type) {
-      case ChordType.Minor7:
-        chordTypeLabel = "-7";
-        break;
-      case ChordType.Perfect7:
-        chordTypeLabel = "7";
-        break;
-      case ChordType.Major7:
-        chordTypeLabel = " Maj7";
-        break;
-    }
+  selectedBaseNote = signal<NoteType>(NoteType.C);
+  selectedChordType = signal<ChordType>(ChordType.Minor7);
 
-    return `${NoteType[chord.baseNote]}${chordTypeLabel}`;
-  });
-
-  lastMidiEventType = MidiEventType.Released;
-  sampler?: Tone.Sampler;
-
-
-  constructor(protected keyboardService: KeyboardService) { 
+  constructor(protected keyboardService: KeyboardService) {
+    this.drawChord();
   }
 
   public changeChord() {
     this.generateNewChord();
     this.drawChord();
+    this.clearFeedback();
   }
 
   public onVoicingChange(event: Event) {
     const value = (event.target as HTMLSelectElement).value as VoicingStyle;
     this.voicingStyle.set(value);
+    this.drawChord();
+  }
+
+  public onBaseNoteChange(event: Event) {
+    this.selectedBaseNote.set(Number((event.target as HTMLSelectElement).value) as NoteType);
+  }
+
+  public onChordTypeChange(event: Event) {
+    this.selectedChordType.set(Number((event.target as HTMLSelectElement).value) as ChordType);
+  }
+
+  public submitGuess() {
+    const matches =
+      this.selectedBaseNote() === this.currentChord().baseNote &&
+      this.selectedChordType() === this.currentChord().type;
+
+    this.clearFeedback();
+
+    if (matches) {
+      this.currentChordCorrect.set(true);
+      setTimeout(() => {
+        this.currentChordCorrect.set(false);
+        this.generateNewChord();
+        this.drawChord();
+      }, 500);
+      return;
+    }
+
+    this.currentChordWrong.set(true);
+    setTimeout(() => this.currentChordWrong.set(false), 500);
+  }
+
+  private clearFeedback() {
+    this.currentChordWrong.set(false);
+    this.currentChordCorrect.set(false);
   }
 
   private drawChord() {
@@ -69,8 +94,8 @@ export class RecognizeChordComponent {
     const chord = this.currentChord();
     const intervals = this.getIntervalsArray(chord.type);
 
-    const notes = [];
-    const start = Math.random() < 0.5 ? 1 : 3; // Uso o il 1 o il 3 rivolto per semplificare
+    const notes: Note[] = [];
+    const start = Math.random() < 0.5 ? 1 : 3;
 
     for (let i = 0; i < intervals.length; i++) {
       const index = (start + i) % intervals.length;
@@ -80,7 +105,7 @@ export class RecognizeChordComponent {
       }
     }
 
-    this.keyboardService.pressedNotes.set([...notes]);
+    this.keyboardService.pressedNotes.set(notes);
   }
 
   private getIntervalsArray(chordType: ChordType): Interval[] {
@@ -88,47 +113,25 @@ export class RecognizeChordComponent {
       case ChordType.Minor7:
         return [Interval.II, Interval.IIIm, Interval.V, Interval.VIIm];
       case ChordType.Perfect7:
-        if (this.voicingStyle() === VoicingStyle.Standard) {
-          return [Interval.II, Interval.IIIM, Interval.V, Interval.VIIm];
-        }
-        else {
-          return [Interval.II, Interval.IIIM, Interval.VI, Interval.VIIm];
-        }
+        return this.voicingStyle() === VoicingStyle.Standard
+          ? [Interval.II, Interval.IIIM, Interval.V, Interval.VIIm]
+          : [Interval.II, Interval.IIIM, Interval.VI, Interval.VIIm];
       case ChordType.Major7:
-        if (this.voicingStyle() === VoicingStyle.Standard) {
-          return [Interval.II, Interval.IIIM, Interval.V, Interval.VIIM];
-        }
-        else {
-          return [Interval.II, Interval.IIIM, Interval.V, Interval.VI];
-        }
+        return this.voicingStyle() === VoicingStyle.Standard
+          ? [Interval.II, Interval.IIIM, Interval.V, Interval.VIIM]
+          : [Interval.II, Interval.IIIM, Interval.V, Interval.VI];
     }
   }
 
   private generateNewChord() {
     let newChord = PlayChordComponent.generateRandomChord();
-    while (newChord.baseNote === this.currentChord().baseNote && newChord.type === this.currentChord().type) {
+    while (
+      newChord.baseNote === this.currentChord().baseNote &&
+      newChord.type === this.currentChord().type
+    ) {
       newChord = PlayChordComponent.generateRandomChord();
     }
 
     this.currentChord.set(newChord);
   }
-
-
-
-  static generateRandomChord(): ChordDefinition {
-    return {
-      baseNote: PlayChordComponent.getRandomEnumValue(NoteType),
-      type: PlayChordComponent.getRandomEnumValue(ChordType)
-    };
-
-  }
-
-  static getRandomEnumValue = (enumeration: any) => {
-    const values = Object.keys(enumeration)
-      .filter(k => !isNaN(Number(k)))
-      .map(k => Number(k));
-
-    const randomIndex = Math.floor(Math.random() * values.length);
-    return values[randomIndex];
-  };
 }
