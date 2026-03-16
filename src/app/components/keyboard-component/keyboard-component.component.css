@@ -1,0 +1,81 @@
+
+/* Piano Section & Responsiveness */
+.piano-container {
+  background: #0a0a0a;
+  padding: 20px 10px;
+  border-radius: 20px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: flex-start;
+  overflow-x: auto;
+  border: 1px solid #222;
+  
+  /* Nasconde scrollbar ma permette scroll */
+  -webkit-overflow-scrolling: touch;
+  &::-webkit-scrollbar { height: 6px; }
+  &::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+}
+
+.piano-keyboard {
+  display: flex;
+  position: relative;
+  height: 180px; 
+  margin: 0 auto;
+  padding-bottom: 5px;
+}
+
+.key{
+  cursor: pointer;
+}
+
+.white-key {
+  width: 35px;
+  height: 100%;
+  background: linear-gradient(to bottom, #fff 0%, #f0f0f0 100%);
+  /* Bordo laterale e inferiore per dare profondità */
+  border: 1px solid #ccc;
+  border-bottom: 4px solid #bbb; 
+  border-radius: 0 0 5px 5px;
+  margin-right: -1px;
+  z-index: 1;
+  box-sizing: border-box;
+}
+
+.black-key {
+  width: 22px;
+  height: 60%;
+  background: linear-gradient(to bottom, #444 0%, #000 100%);
+  /* Bordo leggermente più chiaro del nero per visibilità */
+  border: 1px solid #222;
+  border-bottom: 3px solid #000;
+  margin-left: -11px;
+  margin-right: -11px;
+  z-index: 2;
+  border-radius: 0 0 3px 3px;
+  box-sizing: border-box;
+}
+
+.key.pressed {
+  background: #00adb5 !important;
+  /* Riduciamo il bordo inferiore quando premuto per simulare la pressione */
+  border-bottom-width: 1px;
+  box-shadow: 0 0 20px #00adb5, inset 0 0 10px rgba(255,255,255,0.3);
+  transform: translateY(2px);
+  border-color: #00adb5;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 600px) {
+  :host { padding: 0.5rem; }
+  
+  .piano-keyboard { height: 140px; }
+  
+  .white-key { 
+    width: 30px;
+    border-bottom-width: 3px; 
+  }
+  
+  .black-key { width: 18px; margin-left: -9px; margin-right: -9px; }
+  
+  .chord-display { margin-bottom: 1rem; }
+}
