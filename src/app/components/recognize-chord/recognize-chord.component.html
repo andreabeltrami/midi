@@ -34,7 +34,12 @@
         </select>
       </div>
 
-      <button class="confirm-btn" (click)="submitGuess()">OK</button>
+      <div class="guess-actions">
+        <button class="play-btn" (click)="playCurrentChordPreview()" aria-label="Suona accordo">
+          <span aria-hidden="true">&#127908;</span>
+        </button>
+        <button class="confirm-btn" (click)="submitGuess()">OK</button>
+      </div>
     </div>
 
     <div class="selection-container">

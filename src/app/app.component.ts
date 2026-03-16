@@ -12,8 +12,13 @@ type GameMode = 'play' | 'recognize' | null;
 })
 export class AppComponent {
   selectedMode = signal<GameMode>(null);
+  menuCollapsed = signal<boolean>(false);
 
   selectMode(mode: Exclude<GameMode, null>) {
     this.selectedMode.set(mode);
+  }
+
+  toggleMenu() {
+    this.menuCollapsed.set(!this.menuCollapsed());
   }
 }

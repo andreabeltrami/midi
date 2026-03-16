@@ -1,6 +1,18 @@
-<div class="shell" [class.mode-selected]="selectedMode() !== null">
+<div
+  class="shell"
+  [class.mode-selected]="selectedMode() !== null"
+  [class.menu-collapsed]="selectedMode() !== null && menuCollapsed()">
   <aside class="mode-picker">
     <div class="mode-picker-inner">
+      @if (selectedMode() !== null) {
+        <button class="menu-toggle" (click)="toggleMenu()">
+          <span>☰</span>
+          @if (!menuCollapsed()) {
+            <span>Menu</span>
+          }
+        </button>
+      }
+
       <p class="eyebrow">Mini Games</p>
       <h1>MIDI Trainer</h1>
       <p class="description">
@@ -9,18 +21,28 @@
 
       <button
         class="mode-button"
+        [class.compact]="selectedMode() !== null"
         [class.active]="selectedMode() === 'play'"
+        [attr.aria-label]="menuCollapsed() ? 'Play Chord' : null"
         (click)="selectMode('play')">
+        <span class="mode-icon" aria-hidden="true">&#127929;</span>
         <span class="mode-title">Play Chord</span>
-        <span class="mode-copy">Suona l’accordo richiesto sulla tastiera</span>
+        @if (!(selectedMode() !== null && menuCollapsed())) {
+          <span class="mode-copy">Suona l'accordo richiesto sulla tastiera</span>
+        }
       </button>
 
       <button
         class="mode-button"
+        [class.compact]="selectedMode() !== null"
         [class.active]="selectedMode() === 'recognize'"
+        [attr.aria-label]="menuCollapsed() ? 'Recognize Chord' : null"
         (click)="selectMode('recognize')">
+        <span class="mode-icon" aria-hidden="true">&#127911;</span>
         <span class="mode-title">Recognize Chord</span>
-        <span class="mode-copy">Guarda il voicing e indovina accordo e qualità</span>
+        @if (!(selectedMode() !== null && menuCollapsed())) {
+          <span class="mode-copy">Guarda il voicing e indovina accordo e qualita</span>
+        }
       </button>
     </div>
   </aside>

@@ -15,7 +15,11 @@
 }
 
 .shell.mode-selected {
-  grid-template-columns: 240px minmax(0, 1fr);
+  grid-template-columns: 260px minmax(0, 1fr);
+}
+
+.shell.mode-selected.menu-collapsed {
+  grid-template-columns: 78px minmax(0, 1fr);
 }
 
 .mode-picker {
@@ -28,13 +32,40 @@
 .shell.mode-selected .mode-picker {
   place-items: stretch;
   border-right-color: rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(10, 15, 18, 0.94);
 }
 
 .mode-picker-inner {
   width: min(560px, 100%);
   display: grid;
   gap: 1rem;
+}
+
+.shell.mode-selected .mode-picker-inner {
+  width: 100%;
+  align-content: start;
+}
+
+.menu-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #dce4e8;
+  min-height: 40px;
+  cursor: pointer;
+  padding: 0.4rem 0.7rem;
+}
+
+.menu-toggle:hover {
+  border-color: #00adb5;
+}
+
+.shell.menu-collapsed .menu-toggle {
+  padding: 0.4rem;
 }
 
 .eyebrow {
@@ -55,6 +86,12 @@ h1 {
   color: #9eb0b6;
 }
 
+.shell.menu-collapsed .eyebrow,
+.shell.menu-collapsed h1,
+.shell.menu-collapsed .description {
+  display: none;
+}
+
 .mode-button {
   text-align: left;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -66,10 +103,28 @@ h1 {
   transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
+.mode-button.compact {
+  border-radius: 12px;
+  padding: 0.75rem;
+}
+
 .mode-button:hover {
   transform: translateY(-2px);
   border-color: #00adb5;
   background: rgba(0, 173, 181, 0.08);
+}
+
+.shell.menu-collapsed .mode-button {
+  padding: 0.75rem 0.45rem;
+  text-align: center;
+}
+
+.shell.menu-collapsed .mode-icon {
+  display: block;
+}
+
+.shell.menu-collapsed .mode-title {
+  display: none;
 }
 
 .mode-button.active {
@@ -84,9 +139,19 @@ h1 {
   margin-bottom: 0.25rem;
 }
 
+.mode-icon {
+  display: none;
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
 .mode-copy {
   display: block;
   color: #9eb0b6;
+}
+
+.shell.menu-collapsed .mode-title {
+  font-size: 0.78rem;
 }
 
 .stage {
@@ -106,10 +171,34 @@ h1 {
     grid-template-columns: 1fr;
   }
 
+  .shell.mode-selected.menu-collapsed {
+    grid-template-columns: 1fr;
+  }
+
   .mode-picker,
   .shell.mode-selected .mode-picker {
     border-right: 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     place-items: stretch;
+  }
+
+  .shell.menu-collapsed .eyebrow,
+  .shell.menu-collapsed h1,
+  .shell.menu-collapsed .description {
+    display: block;
+  }
+
+  .shell.menu-collapsed .mode-button {
+    text-align: left;
+    padding: 0.75rem;
+  }
+
+  .shell.menu-collapsed .mode-icon {
+    display: none;
+  }
+
+  .shell.menu-collapsed .mode-title {
+    display: block;
+    font-size: 1rem;
   }
 }

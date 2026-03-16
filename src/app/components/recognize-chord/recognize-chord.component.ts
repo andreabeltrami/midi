@@ -8,6 +8,7 @@ import { Note } from '../../types/note';
 import { PlayChordComponent } from '../play-chord/play-chord.component';
 import { KeyboardComponentComponent } from '../keyboard-component/keyboard-component.component';
 import { KeyboardService } from '../../services/keyboard.service';
+import * as Tone from 'tone';
 
 @Component({
   selector: 'app-recognize-chord',
@@ -38,9 +39,11 @@ export class RecognizeChordComponent {
 
   selectedBaseNote = signal<NoteType>(NoteType.C);
   selectedChordType = signal<ChordType>(ChordType.Minor7);
+  private sampler?: Tone.Sampler;
 
   constructor(protected keyboardService: KeyboardService) {
     this.drawChord();
+    this.initializeToneSampler();
   }
 
   public changeChord() {
@@ -82,6 +85,40 @@ export class RecognizeChordComponent {
 
     this.currentChordWrong.set(true);
     setTimeout(() => this.currentChordWrong.set(false), 500);
+  }
+
+  public async playCurrentChordPreview() {
+    if (this.keyboardService.pressedNotes().length === 0) {
+      this.drawChord();
+    }
+
+    await Tone.start();
+    if (!this.sampler) {
+      return;
+    }
+
+    const noteNames = this.keyboardService
+      .pressedNotes()
+      .map((note) => Tone.Frequency(note.originalNumber, 'midi').toNote());
+
+    this.sampler.triggerAttackRelease(noteNames, '1n', Tone.now());
+  }
+
+  private initializeToneSampler() {
+    try {
+      this.sampler = new Tone.Sampler({
+        urls: {
+          C4: 'C4.mp3',
+          'D#4': 'Ds4.mp3',
+          'F#4': 'Fs4.mp3',
+          A4: 'A4.mp3',
+        },
+        release: 1,
+        baseUrl: 'https://tonejs.github.io/audio/salamander/',
+      }).toDestination();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   private clearFeedback() {

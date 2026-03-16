@@ -125,6 +125,29 @@ select {
   filter: brightness(1.05);
 }
 
+.guess-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.play-btn {
+  width: 44px;
+  min-height: 44px;
+  border-radius: 12px;
+  border: 1px solid #2e4e51;
+  background: #18363a;
+  color: #b6f2f5;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.play-btn:hover {
+  border-color: #00adb5;
+  color: #ffffff;
+}
+
 @media (max-width: 720px) {
   .guess-panel {
     align-items: stretch;
@@ -132,6 +155,15 @@ select {
 
   .guess-panel > * {
     width: 100%;
+  }
+
+  .guess-actions {
+    width: 100%;
+  }
+
+  .play-btn,
+  .confirm-btn {
+    flex: 1;
   }
 
   .confirm-btn {
