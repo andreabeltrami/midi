@@ -68,6 +68,21 @@
   padding: 0.4rem;
 }
 
+.shell.menu-collapsed .mode-picker {
+  padding: 0.75rem 0.35rem;
+}
+
+.shell.menu-collapsed .mode-picker-inner {
+  justify-items: center;
+  gap: 0.75rem;
+}
+
+.shell.menu-collapsed .menu-toggle {
+  width: 40px;
+  min-height: 40px;
+  padding: 0;
+}
+
 .eyebrow {
   margin: 0;
   text-transform: uppercase;
@@ -115,7 +130,12 @@ h1 {
 }
 
 .shell.menu-collapsed .mode-button {
-  padding: 0.75rem 0.45rem;
+  width: 48px;
+  min-height: 48px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
 }
 
@@ -189,6 +209,9 @@ h1 {
   }
 
   .shell.menu-collapsed .mode-button {
+    width: 100%;
+    min-height: unset;
+    display: block;
     text-align: left;
     padding: 0.75rem;
   }
