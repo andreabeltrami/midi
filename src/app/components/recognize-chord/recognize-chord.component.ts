@@ -9,6 +9,7 @@ import { PlayChordComponent } from '../play-chord/play-chord.component';
 import { KeyboardComponentComponent } from '../keyboard-component/keyboard-component.component';
 import { KeyboardService } from '../../services/keyboard.service';
 import * as Tone from 'tone';
+import { getChordVoicingIntervals } from '../../config/chord-voicings';
 
 @Component({
   selector: 'app-recognize-chord',
@@ -132,7 +133,7 @@ export class RecognizeChordComponent {
     const intervals = this.getIntervalsArray(chord.type);
 
     const notes: Note[] = [];
-    const start = Math.random() < 0.5 ? 1 : 3;
+    const start = this.voicingStyle() === VoicingStyle.Base ? 0 : Math.random() < 0.5 ? 1 : 3;
 
     for (let i = 0; i < intervals.length; i++) {
       const index = (start + i) % intervals.length;
@@ -146,18 +147,8 @@ export class RecognizeChordComponent {
   }
 
   private getIntervalsArray(chordType: ChordType): Interval[] {
-    switch (chordType) {
-      case ChordType.Minor7:
-        return [Interval.II, Interval.IIIm, Interval.V, Interval.VIIm];
-      case ChordType.Perfect7:
-        return this.voicingStyle() === VoicingStyle.Standard
-          ? [Interval.II, Interval.IIIM, Interval.V, Interval.VIIm]
-          : [Interval.II, Interval.IIIM, Interval.VI, Interval.VIIm];
-      case ChordType.Major7:
-        return this.voicingStyle() === VoicingStyle.Standard
-          ? [Interval.II, Interval.IIIM, Interval.V, Interval.VIIM]
-          : [Interval.II, Interval.IIIM, Interval.V, Interval.VI];
-    }
+    const intervals = getChordVoicingIntervals(chordType, this.voicingStyle());
+    return intervals ? [...intervals] : [];
   }
 
   private generateNewChord() {

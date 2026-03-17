@@ -11,6 +11,7 @@ import { PianoKey } from '../../types/piano-key';
 import * as Tone from 'tone';
 import { KeyboardService } from '../../services/keyboard.service';
 import { KeyboardComponentComponent } from "../keyboard-component/keyboard-component.component";
+import { getChordVoicingIntervals } from '../../config/chord-voicings';
 
 @Component({
 	selector: 'app-play-chord',
@@ -19,6 +20,7 @@ import { KeyboardComponentComponent } from "../keyboard-component/keyboard-compo
 	styleUrl: './play-chord.component.css',
 })
 export class PlayChordComponent {
+	
 
 	readonly voicingOptions = Object.values(VoicingStyle);
 
@@ -206,20 +208,22 @@ export class PlayChordComponent {
 
 	private checkChord(): boolean {
 		const baseNote = new Note(this.currentChord().baseNote);
-		const result: Interval[] = this.keyboardService.pressedNotes().map(x => this.getInterval(baseNote, x));
-		const resString = result.sort((a, b) => a - b).map(i => Interval[i]).join(',');
+		const playedIntervals: Interval[] = this.keyboardService.pressedNotes().map(x => this.getInterval(baseNote, x));
+		const expectedIntervals = getChordVoicingIntervals(this.currentChord().type, this.voicingStyle());
 
-		switch (this.currentChord().type) {
-			case ChordType.Minor7:
-				return resString === 'II,IIIm,V,VIIm'
-			case ChordType.Perfect7:
-				return resString ===
-					(this.voicingStyle() === VoicingStyle.Standard ? 'II,IIIM,V,VIIm' : 'II,IIIM,VI,VIIm')
-			case ChordType.Major7:
-				return resString ===
-					(this.voicingStyle() === VoicingStyle.Standard ? 'II,IIIM,V,VIIM' : 'II,IIIM,V,VI')
+		if (!expectedIntervals) {
+			return false;
 		}
+
+		return this.serializeIntervals(playedIntervals) === this.serializeIntervals(expectedIntervals);
 	}
+
+	private serializeIntervals(intervals: readonly Interval[]): string {
+		return [...intervals].sort((a, b) => a - b).join(',');
+	}
+
+
+	
 
 	static generateRandomChord(): ChordDefinition {
 		return {
