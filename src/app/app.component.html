@@ -1,61 +1,62 @@
-<div
-  class="shell"
-  [class.mode-selected]="selectedMode() !== null"
-  [class.menu-collapsed]="selectedMode() !== null && menuCollapsed()">
-  <aside class="mode-picker">
-    <div class="mode-picker-inner">
-      @if (selectedMode() !== null) {
-        <button class="menu-toggle" (click)="toggleMenu()">
-          <span>☰</span>
-          @if (!menuCollapsed()) {
-            <span>Menu</span>
-          }
-        </button>
-      }
+<div class="app-shell">
+  @if (selectedMode() === null) {
+    <section class="landing-screen">
+      <div class="landing-orb" aria-hidden="true"></div>
 
-      <p class="eyebrow">Mini Games</p>
+      <p class="eyebrow">Interactive Lab</p>
       <h1>MIDI Trainer</h1>
-      <p class="description">
-        Scegli una modalità e continua a cambiarla dal menu laterale.
-      </p>
+      <p class="description">Scegli come allenarti. I pulsanti grandi compaiono solo qui, all'inizio.</p>
 
-      <button
-        class="mode-button"
-        [class.compact]="selectedMode() !== null"
-        [class.active]="selectedMode() === 'play'"
-        [attr.aria-label]="menuCollapsed() ? 'Play Chord' : null"
-        (click)="selectMode('play')">
-        <span class="mode-icon" aria-hidden="true">&#127929;</span>
-        <span class="mode-title">Play Chord</span>
-        @if (!(selectedMode() !== null && menuCollapsed())) {
-          <span class="mode-copy">Suona l'accordo richiesto sulla tastiera</span>
-        }
-      </button>
+      <div class="landing-actions" role="navigation" aria-label="Game mode selector">
+        <button class="hero-mode" (click)="selectMode('play')">
+          <span class="hero-icon" aria-hidden="true">&#127929;</span>
+          <span class="hero-content">
+            <span class="hero-title">Play Chord</span>
+            <span class="hero-copy">Suona l'accordo richiesto sulla tastiera</span>
+          </span>
+          <span class="hero-tag">Ear</span>
+        </button>
 
-      <button
-        class="mode-button"
-        [class.compact]="selectedMode() !== null"
-        [class.active]="selectedMode() === 'recognize'"
-        [attr.aria-label]="menuCollapsed() ? 'Recognize Chord' : null"
-        (click)="selectMode('recognize')">
-        <span class="mode-icon" aria-hidden="true">&#127911;</span>
-        <span class="mode-title">Recognize Chord</span>
-        @if (!(selectedMode() !== null && menuCollapsed())) {
-          <span class="mode-copy">Guarda il voicing e indovina accordo e qualita</span>
-        }
-      </button>
-    </div>
-  </aside>
+        <button class="hero-mode" (click)="selectMode('recognize')">
+          <span class="hero-icon" aria-hidden="true">&#127911;</span>
+          <span class="hero-content">
+            <span class="hero-title">Recognize Chord</span>
+            <span class="hero-copy">Guarda il voicing e indovina accordo e qualita</span>
+          </span>
+          <span class="hero-tag">Theory</span>
+        </button>
+      </div>
+    </section>
+  } @else {
+    <header class="topbar" role="navigation" aria-label="Main menu">
+      <div class="topbar-brand">
+        <span class="brand-badge" aria-hidden="true">M</span>
+        <div>
+          <p class="topbar-eyebrow">MIDI Trainer</p>
+          <p class="topbar-subtitle">Menu principale</p>
+        </div>
+      </div>
 
-  <main class="stage">
-    @if (selectedMode() === 'play') {
-      <app-play-chord></app-play-chord>
-    } @else if (selectedMode() === 'recognize') {
-      <app-recognize-chord></app-recognize-chord>
-    } @else {
-      <section class="welcome-panel">
-        <h2>Scegli una modalità per iniziare</h2>
-      </section>
-    }
-  </main>
+      <div class="topbar-actions">
+        <button class="menu-link" [class.active]="selectedMode() === 'play'" (click)="selectMode('play')">
+          Play Chord
+        </button>
+        <button
+          class="menu-link"
+          [class.active]="selectedMode() === 'recognize'"
+          (click)="selectMode('recognize')">
+          Recognize Chord
+        </button>
+        <button class="menu-link ghost" (click)="resetModeSelection()">Torna all'inizio</button>
+      </div>
+    </header>
+
+    <main class="stage">
+      @if (selectedMode() === 'play') {
+        <app-play-chord></app-play-chord>
+      } @else if (selectedMode() === 'recognize') {
+        <app-recognize-chord></app-recognize-chord>
+      }
+    </main>
+  }
 </div>
