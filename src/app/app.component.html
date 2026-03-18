@@ -29,25 +29,34 @@
     </section>
   } @else {
     <header class="topbar" role="navigation" aria-label="Main menu">
-      <div class="topbar-brand">
-        <span class="brand-badge" aria-hidden="true">M</span>
-        <div>
-          <p class="topbar-eyebrow">MIDI Trainer</p>
-          <p class="topbar-subtitle">Menu principale</p>
-        </div>
+      <div class="topbar-brand" aria-hidden="true">
+        <span class="brand-badge">&#9836;</span>
       </div>
 
       <div class="topbar-actions">
-        <button class="menu-link" [class.active]="selectedMode() === 'play'" (click)="selectMode('play')">
-          Play Chord
+        <button
+          class="menu-link icon-link"
+          [class.active]="selectedMode() === 'play'"
+          (click)="selectMode('play')"
+          aria-label="Play Chord"
+          title="Play Chord">
+          <span aria-hidden="true">&#127929;</span>
         </button>
         <button
-          class="menu-link"
+          class="menu-link icon-link"
           [class.active]="selectedMode() === 'recognize'"
-          (click)="selectMode('recognize')">
-          Recognize Chord
+          (click)="selectMode('recognize')"
+          aria-label="Recognize Chord"
+          title="Recognize Chord">
+          <span aria-hidden="true">&#127911;</span>
         </button>
-        <button class="menu-link ghost" (click)="resetModeSelection()">Torna all'inizio</button>
+        <button
+          class="menu-link icon-link ghost"
+          (click)="resetModeSelection()"
+          aria-label="Torna all'inizio"
+          title="Torna all'inizio">
+          <span aria-hidden="true">&#127968;</span>
+        </button>
       </div>
     </header>
 
