@@ -233,6 +233,12 @@ h1 {
   padding-top: 56px;
 }
 
+.leaderboard-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
 .stage::before {
   content: '';
   position: absolute;

@@ -68,13 +68,13 @@
     </div>
 
     <div class="selection-container">
-      <button class="reset-btn" (click)="changeChord()">
+      <button class="reset-btn" (click)="changeChord()" [disabled]="gameActive()">
         <span class="icon">↺</span> Cambia Accordo
       </button>
 
       <div class="select-wrapper">
         <label for="voicing-select">Voicing Style</label>
-        <select id="voicing-select" (change)="onVoicingChange($event)">
+        <select id="voicing-select" (change)="onVoicingChange($event)" [disabled]="gameActive()">
           @for (option of voicingOptions; track option) {
             <option [value]="option">{{ option }}</option>
           }
@@ -96,39 +96,4 @@
   </div>
 
   <app-keyboard-component></app-keyboard-component>
-
-  @if (canShowLeaderboard) {
-    <section class="leaderboard-card leaderboard-section">
-      <h3>Classifica tentativi</h3>
-
-      <div class="leaderboard-list">
-        @for (entry of leaderboard(); track entry.id; let i = $index) {
-          <article class="leaderboard-item">
-            <header>
-              <p class="rank">#{{ i + 1 }}</p>
-              <p class="timestamp">{{ getReadableDate(entry.completedAtIso) }}</p>
-            </header>
-
-            <div class="result-grid">
-              <p>
-                Tempo
-                <strong>{{ getElapsedLabelFromMs(entry.elapsedMs) }}</strong>
-              </p>
-              <p>
-                Tentativi
-                <strong>{{ entry.totalGuesses }}</strong>
-              </p>
-              <p>
-                Errori
-                <strong>{{ entry.wrongGuesses }}</strong>
-              </p>
-            </div>
-
-            <p class="chords-title">Accordi indovinati</p>
-            <p class="chords-list">{{ entry.guessedChords.join(' · ') }}</p>
-          </article>
-        }
-      </div>
-    </section>
-  }
 </div>

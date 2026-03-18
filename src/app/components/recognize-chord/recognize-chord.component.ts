@@ -10,15 +10,7 @@ import { KeyboardComponentComponent } from '../keyboard-component/keyboard-compo
 import { KeyboardService } from '../../services/keyboard.service';
 import * as Tone from 'tone';
 import { getChordVoicingIntervals } from '../../config/chord-voicings';
-
-interface GameRunRecord {
-  id: string;
-  completedAtIso: string;
-  elapsedMs: number;
-  totalGuesses: number;
-  wrongGuesses: number;
-  guessedChords: string[];
-}
+import { GameRunRecord } from '../../types/game-run-record';
 
 @Component({
   selector: 'app-recognize-chord',
@@ -242,6 +234,7 @@ export class RecognizeChordComponent implements OnDestroy {
       elapsedMs,
       totalGuesses: this.totalGuesses(),
       wrongGuesses: this.wrongGuesses(),
+      voicingStyle: this.voicingStyle(),
       guessedChords: [...this.currentRunGuessedChords],
     };
 
@@ -294,18 +287,23 @@ export class RecognizeChordComponent implements OnDestroy {
         return;
       }
 
-      const validRecords = parsedValue.filter(
-        (entry) =>
-          typeof entry.id === 'string' &&
-          typeof entry.completedAtIso === 'string' &&
-          typeof entry.elapsedMs === 'number' &&
-          typeof entry.totalGuesses === 'number' &&
-          typeof entry.wrongGuesses === 'number' &&
-          Array.isArray(entry.guessedChords),
-      );
+      const normalizedRecords: GameRunRecord[] = parsedValue
+        .filter(
+          (entry) =>
+            typeof entry.id === 'string' &&
+            typeof entry.completedAtIso === 'string' &&
+            typeof entry.elapsedMs === 'number' &&
+            typeof entry.totalGuesses === 'number' &&
+            typeof entry.wrongGuesses === 'number' &&
+            Array.isArray(entry.guessedChords),
+        )
+        .map((entry) => ({
+          ...entry,
+          voicingStyle: typeof entry.voicingStyle === 'string' ? entry.voicingStyle : 'Unknown',
+        }));
 
       this.leaderboard.set(
-        validRecords.sort((first, second) => {
+        normalizedRecords.sort((first, second) => {
           if (first.elapsedMs !== second.elapsedMs) {
             return first.elapsedMs - second.elapsedMs;
           }

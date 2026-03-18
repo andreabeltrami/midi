@@ -1,0 +1,72 @@
+<section class="results-table-card">
+  <header class="results-head">
+    <div>
+      <h3>Classifica tentativi</h3>
+      <p>Filtra e ordina i risultati salvati in locale.</p>
+    </div>
+
+    <div class="filters-row">
+      <label>
+        <span>Filtra voicing</span>
+        <select (change)="setVoicingFilter($event)">
+          @for (voicing of voicingOptions(); track voicing) {
+            <option [value]="voicing">{{ voicing === 'all' ? 'Tutti' : voicing }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        <span>Cerca</span>
+        <input type="text" placeholder="Accordo o data" (input)="setSearchTerm($event)" />
+      </label>
+
+      <label>
+        <span>Ordina per</span>
+        <select (change)="setSortField($event)">
+          <option value="elapsedMs">Tempo</option>
+          <option value="completedAtIso">Data</option>
+          <option value="totalGuesses">Tentativi</option>
+          <option value="wrongGuesses">Errori</option>
+          <option value="voicingStyle">Voicing</option>
+        </select>
+      </label>
+
+      <button class="sort-direction-btn" (click)="toggleSortDirection()" type="button">
+        {{ sortDirection() === 'asc' ? 'Asc' : 'Desc' }}
+      </button>
+    </div>
+  </header>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Data</th>
+          <th>Tempo</th>
+          <th>Tentativi</th>
+          <th>Errori</th>
+          <th>Voicing</th>
+          <th>Accordi indovinati</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (entry of filteredRecords(); track entry.id; let i = $index) {
+          <tr>
+            <td>{{ i + 1 }}</td>
+            <td>{{ getReadableDate(entry.completedAtIso) }}</td>
+            <td>{{ getElapsedLabelFromMs(entry.elapsedMs) }}</td>
+            <td>{{ entry.totalGuesses }}</td>
+            <td>{{ entry.wrongGuesses }}</td>
+            <td>{{ entry.voicingStyle }}</td>
+            <td>{{ entry.guessedChords.join(' · ') }}</td>
+          </tr>
+        } @empty {
+          <tr>
+            <td class="empty" colspan="7">Nessun risultato per i filtri selezionati.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

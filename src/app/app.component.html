@@ -51,6 +51,14 @@
           <span aria-hidden="true">&#127911;</span>
         </button>
         <button
+          class="menu-link icon-link"
+          [class.active]="selectedMode() === 'leaderboard'"
+          (click)="selectMode('leaderboard')"
+          aria-label="Classifica"
+          title="Classifica">
+          <span aria-hidden="true">&#127942;</span>
+        </button>
+        <button
           class="menu-link icon-link ghost"
           (click)="resetModeSelection()"
           aria-label="Torna all'inizio"
@@ -65,6 +73,10 @@
         <app-play-chord></app-play-chord>
       } @else if (selectedMode() === 'recognize') {
         <app-recognize-chord></app-recognize-chord>
+      } @else if (selectedMode() === 'leaderboard') {
+        <div class="leaderboard-page">
+          <app-recognize-results-table></app-recognize-results-table>
+        </div>
       }
     </main>
   }
