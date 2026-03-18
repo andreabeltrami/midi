@@ -2,6 +2,31 @@
   <div class="chord-display">
     <span class="chord-label">Recognize Chord</span>
 
+    <div class="challenge-bar">
+      <div class="challenge-stats">
+        <p class="challenge-item">
+          <span>Streak</span>
+          <strong>{{ currentStreak() }}/{{ targetStreak }}</strong>
+        </p>
+        <p class="challenge-item">
+          <span>Tempo</span>
+          <strong>{{ getElapsedLabel(elapsedSeconds()) }}</strong>
+        </p>
+        <p class="challenge-item">
+          <span>Tentativi</span>
+          <strong>{{ totalGuesses() }}</strong>
+        </p>
+      </div>
+
+      <div class="challenge-actions">
+        @if (gameActive()) {
+          <button class="challenge-btn secondary" (click)="abortChallenge()">Interrompi</button>
+        } @else {
+          <button class="challenge-btn" (click)="startChallenge()">Avvia sfida ({{this.targetStreak}} corretti)</button>
+        }
+      </div>
+    </div>
+
     <h2
       class="chord-name hidden-target"
       [class.wrong]="currentChordWrong()"
@@ -56,7 +81,54 @@
         </select>
       </div>
     </div>
+
+    @if (latestResult()) {
+      <section class="last-run-card">
+        <h3>Ultimo risultato</h3>
+        <p>
+          Hai completato la sfida in
+          <strong>{{ getElapsedLabelFromMs(latestResult()!.elapsedMs) }}</strong>
+          con <strong>{{ latestResult()!.totalGuesses }}</strong> tentativi.
+        </p>
+      </section>
+    }
+
   </div>
 
   <app-keyboard-component></app-keyboard-component>
+
+  @if (canShowLeaderboard) {
+    <section class="leaderboard-card leaderboard-section">
+      <h3>Classifica tentativi</h3>
+
+      <div class="leaderboard-list">
+        @for (entry of leaderboard(); track entry.id; let i = $index) {
+          <article class="leaderboard-item">
+            <header>
+              <p class="rank">#{{ i + 1 }}</p>
+              <p class="timestamp">{{ getReadableDate(entry.completedAtIso) }}</p>
+            </header>
+
+            <div class="result-grid">
+              <p>
+                Tempo
+                <strong>{{ getElapsedLabelFromMs(entry.elapsedMs) }}</strong>
+              </p>
+              <p>
+                Tentativi
+                <strong>{{ entry.totalGuesses }}</strong>
+              </p>
+              <p>
+                Errori
+                <strong>{{ entry.wrongGuesses }}</strong>
+              </p>
+            </div>
+
+            <p class="chords-title">Accordi indovinati</p>
+            <p class="chords-list">{{ entry.guessedChords.join(' · ') }}</p>
+          </article>
+        }
+      </div>
+    </section>
+  }
 </div>
