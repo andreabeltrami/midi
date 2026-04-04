@@ -1,13 +1,13 @@
 import { Component, signal } from '@angular/core';
 import { PlayChordComponent } from './components/play-chord/play-chord.component';
 import { RecognizeChordComponent } from './components/recognize-chord/recognize-chord.component';
-import { RecognizeResultsTableComponent } from './components/recognize-results-table/recognize-results-table.component';
+import { ResultTableComponent } from './components/result-table/result-table.component';
 
 type GameMode = 'play' | 'recognize' | 'leaderboard' | null;
 
 @Component({
   selector: 'app-root',
-  imports: [PlayChordComponent, RecognizeChordComponent, RecognizeResultsTableComponent],
+  imports: [PlayChordComponent, RecognizeChordComponent, ResultTableComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })

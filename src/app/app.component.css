@@ -124,6 +124,12 @@ h1 {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.icon-glyph,
+.hero-icon,
+.brand-badge {
+  font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', 'Segoe UI Symbol', sans-serif;
+}
+
 .hero-content {
   min-width: 0;
 }
@@ -206,6 +212,12 @@ h1 {
   display: grid;
   place-items: center;
   font-size: 1.05rem;
+  line-height: 1;
+}
+
+.icon-link .icon-glyph {
+  display: block;
+  font-size: 1.15rem;
   line-height: 1;
 }
 

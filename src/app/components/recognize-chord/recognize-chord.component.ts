@@ -236,6 +236,7 @@ export class RecognizeChordComponent implements OnDestroy {
       wrongGuesses: this.wrongGuesses(),
       voicingStyle: this.voicingStyle(),
       guessedChords: [...this.currentRunGuessedChords],
+      gameType: 'recognize',
     };
 
     this.latestResult.set(newRecord);
@@ -300,6 +301,7 @@ export class RecognizeChordComponent implements OnDestroy {
         .map((entry) => ({
           ...entry,
           voicingStyle: typeof entry.voicingStyle === 'string' ? entry.voicingStyle : 'Unknown',
+          gameType: entry.gameType === 'play' ? 'play' : 'recognize',
         }));
 
       this.leaderboard.set(

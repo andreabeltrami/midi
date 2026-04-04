@@ -5,11 +5,11 @@
 
       <p class="eyebrow">Interactive Lab</p>
       <h1>MIDI Trainer</h1>
-      <p class="description">Scegli come allenarti. I pulsanti grandi compaiono solo qui, all'inizio.</p>
+      <p class="description">Scegli come allenarti</p>
 
       <div class="landing-actions" role="navigation" aria-label="Game mode selector">
         <button class="hero-mode" (click)="selectMode('play')">
-          <span class="hero-icon" aria-hidden="true">&#127929;</span>
+          <span class="hero-icon" aria-hidden="true">🎹</span>
           <span class="hero-content">
             <span class="hero-title">Play Chord</span>
             <span class="hero-copy">Suona l'accordo richiesto sulla tastiera</span>
@@ -18,7 +18,7 @@
         </button>
 
         <button class="hero-mode" (click)="selectMode('recognize')">
-          <span class="hero-icon" aria-hidden="true">&#127911;</span>
+          <span class="hero-icon" aria-hidden="true">🎧</span>
           <span class="hero-content">
             <span class="hero-title">Recognize Chord</span>
             <span class="hero-copy">Guarda il voicing e indovina accordo e qualita</span>
@@ -30,7 +30,7 @@
   } @else {
     <header class="topbar" role="navigation" aria-label="Main menu">
       <div class="topbar-brand" aria-hidden="true">
-        <span class="brand-badge">&#9836;</span>
+        <span class="brand-badge icon-glyph">♫</span>
       </div>
 
       <div class="topbar-actions">
@@ -40,7 +40,7 @@
           (click)="selectMode('play')"
           aria-label="Play Chord"
           title="Play Chord">
-          <span aria-hidden="true">&#127929;</span>
+          <span class="icon-glyph" aria-hidden="true">🎹</span>
         </button>
         <button
           class="menu-link icon-link"
@@ -48,7 +48,7 @@
           (click)="selectMode('recognize')"
           aria-label="Recognize Chord"
           title="Recognize Chord">
-          <span aria-hidden="true">&#127911;</span>
+          <span class="icon-glyph" aria-hidden="true">🎧</span>
         </button>
         <button
           class="menu-link icon-link"
@@ -56,14 +56,14 @@
           (click)="selectMode('leaderboard')"
           aria-label="Classifica"
           title="Classifica">
-          <span aria-hidden="true">&#127942;</span>
+          <span class="icon-glyph" aria-hidden="true">🏆</span>
         </button>
         <button
           class="menu-link icon-link ghost"
           (click)="resetModeSelection()"
           aria-label="Torna all'inizio"
           title="Torna all'inizio">
-          <span aria-hidden="true">&#127968;</span>
+          <span class="icon-glyph" aria-hidden="true">🏠</span>
         </button>
       </div>
     </header>
@@ -75,7 +75,7 @@
         <app-recognize-chord></app-recognize-chord>
       } @else if (selectedMode() === 'leaderboard') {
         <div class="leaderboard-page">
-          <app-recognize-results-table></app-recognize-results-table>
+          <app-result-table></app-result-table>
         </div>
       }
     </main>

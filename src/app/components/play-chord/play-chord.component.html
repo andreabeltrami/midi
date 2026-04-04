@@ -1,26 +1,70 @@
 <div class="app-container">
   <div class="chord-display">
-    <span class="chord-label">Target Chord</span>
-    <h2 class="chord-name"
-        [class.wrong]='currentChordWrong()'
-        [class.correct]='currentChordCorrect()'>
-      {{ currentChordString() }}
+    <span class="chord-label">Play Chord</span>
+
+    <div class="challenge-bar">
+      <div class="challenge-stats">
+        <p class="challenge-item">
+          <span>Streak</span>
+          <strong>{{ currentStreak() }}/{{ targetStreak }}</strong>
+        </p>
+        <p class="challenge-item">
+          <span>Tempo</span>
+          <strong>{{ getElapsedLabel(elapsedSeconds()) }}</strong>
+        </p>
+        <p class="challenge-item">
+          <span>Tentativi</span>
+          <strong>{{ totalGuesses() }}</strong>
+        </p>
+      </div>
+
+      <div class="challenge-actions">
+        @if (gameActive()) {
+          <button class="challenge-btn secondary" (click)="abortChallenge()">Interrompi</button>
+        } @else {
+          <button class="challenge-btn" (click)="startChallenge()">
+            Avvia sfida ({{ targetStreak }} corretti)
+          </button>
+        }
+      </div>
+    </div>
+
+    <h2 class="chord-name" [class.wrong]="currentChordWrong()" [class.correct]="currentChordCorrect()">
+      @if (currentChordCorrect()) {
+        Corretto
+      } @else if (currentChordWrong()) {
+        Riprova
+      } @else {
+        {{ currentChordString() }}
+      }
     </h2>
 
     <div class="selection-container">
       <button class="reset-btn" (click)="resetPressedNotes()">
         <span class="icon">↺</span> Reset
       </button>
-      
+
       <div class="select-wrapper">
         <label for="voicing-select">Voicing Style</label>
-        <select id="voicing-select" (change)="onVoicingChange($event)">
+        <select id="voicing-select" (change)="onVoicingChange($event)" [disabled]="gameActive()">
           @for (option of voicingOptions; track option) {
             <option [value]="option">{{ option }}</option>
           }
         </select>
       </div>
     </div>
+
+    @if (latestResult()) {
+      <section class="last-run-card">
+        <h3>Ultimo risultato</h3>
+        <p>
+          Hai completato la sfida in
+          <strong>{{ getElapsedLabelFromMs(latestResult()!.elapsedMs) }}</strong>
+          con <strong>{{ latestResult()!.totalGuesses }}</strong> tentativi e
+          <strong>{{ latestResult()!.wrongGuesses }}</strong> errori.
+        </p>
+      </section>
+    }
   </div>
 
   <app-keyboard-component></app-keyboard-component>

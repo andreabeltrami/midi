@@ -1,8 +1,22 @@
 <section class="results-table-card">
   <header class="results-head">
     <div>
-      <h3>Classifica tentativi</h3>
-      <p>Filtra e ordina i risultati salvati in locale.</p>
+      <h3>Result Table</h3>
+      <p>Storico completo di `Play Chord` e `Recognize Chord`, salvato in locale.</p>
+    </div>
+
+    <div class="tabs-row" role="tablist" aria-label="Filtro gioco">
+      @for (tab of tabs; track tab.value) {
+        <button
+          class="tab-btn"
+          type="button"
+          role="tab"
+          [class.active]="selectedTab() === tab.value"
+          [attr.aria-selected]="selectedTab() === tab.value"
+          (click)="setTab(tab.value)">
+          {{ tab.label }}
+        </button>
+      }
     </div>
 
     <div class="filters-row">
@@ -17,7 +31,7 @@
 
       <label>
         <span>Cerca</span>
-        <input type="text" placeholder="Accordo o data" (input)="setSearchTerm($event)" />
+        <input type="text" placeholder="Accordo, gioco o data" (input)="setSearchTerm($event)" />
       </label>
 
       <label>
@@ -25,6 +39,7 @@
         <select (change)="setSortField($event)">
           <option value="elapsedMs">Tempo</option>
           <option value="completedAtIso">Data</option>
+          <option value="gameType">Gioco</option>
           <option value="totalGuesses">Tentativi</option>
           <option value="wrongGuesses">Errori</option>
           <option value="voicingStyle">Voicing</option>
@@ -42,18 +57,20 @@
       <thead>
         <tr>
           <th>#</th>
+          <th>Gioco</th>
           <th>Data</th>
           <th>Tempo</th>
           <th>Tentativi</th>
           <th>Errori</th>
           <th>Voicing</th>
-          <th>Accordi indovinati</th>
+          <th>Accordi</th>
         </tr>
       </thead>
       <tbody>
         @for (entry of filteredRecords(); track entry.id; let i = $index) {
           <tr>
             <td>{{ i + 1 }}</td>
+            <td><span class="game-badge">{{ getGameLabel(entry.gameType) }}</span></td>
             <td>{{ getReadableDate(entry.completedAtIso) }}</td>
             <td>{{ getElapsedLabelFromMs(entry.elapsedMs) }}</td>
             <td>{{ entry.totalGuesses }}</td>
@@ -63,7 +80,7 @@
           </tr>
         } @empty {
           <tr>
-            <td class="empty" colspan="7">Nessun risultato per i filtri selezionati.</td>
+            <td class="empty" colspan="8">Nessun risultato per i filtri selezionati.</td>
           </tr>
         }
       </tbody>
