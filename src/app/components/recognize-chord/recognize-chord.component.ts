@@ -39,6 +39,7 @@ export class RecognizeChordComponent implements OnDestroy {
   currentChordWrong = signal(false);
   currentChordCorrect = signal(false);
   voicingStyle = signal<VoicingStyle>(VoicingStyle.Standard);
+  showVoicingInfo = signal(false);
 
   gameActive = signal(false);
   currentStreak = signal(0);
@@ -131,6 +132,14 @@ export class RecognizeChordComponent implements OnDestroy {
     const value = (event.target as HTMLSelectElement).value as VoicingStyle;
     this.voicingStyle.set(value);
     this.drawChord();
+  }
+
+  public toggleVoicingInfo() {
+    this.showVoicingInfo.update((value) => !value);
+  }
+
+  public hideVoicingInfo() {
+    this.showVoicingInfo.set(false);
   }
 
   public onBaseNoteChange(event: Event) {

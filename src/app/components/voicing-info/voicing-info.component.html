@@ -1,15 +1,19 @@
-<details class="voicing-guide-card">
-  <summary class="voicing-guide-toggle">
-    <span class="toggle-title">ℹ️ {{ 'voicing.sectionTitle' | t }}</span>
-    @if (activeStyle()) {
-      <span class="toggle-active">{{ getActiveLabelKey() | t }}</span>
-    }
-  </summary>
+<section class="voicing-guide-card" role="dialog" [attr.aria-label]="'voicing.sectionTitle' | t">
+  <header class="voicing-guide-head">
+    <div class="voicing-guide-title">
+      <h3>{{ 'voicing.sectionTitle' | t }}</h3>
+      @if (activeStyle()) {
+        <span class="toggle-active">{{ getActiveLabelKey() | t }}</span>
+      }
+    </div>
+
+    <button type="button" class="close-btn" (click)="close()" [attr.aria-label]="'common.close' | t">
+      ✕
+    </button>
+  </header>
 
   <div class="voicing-guide-content">
-    <header class="voicing-guide-head">
-      <p>{{ 'voicing.sectionDescription' | t }}</p>
-    </header>
+    <p class="guide-description">{{ 'voicing.sectionDescription' | t }}</p>
 
     <div class="voicing-guide-grid">
       @for (guide of guides; track guide.style) {
@@ -29,4 +33,4 @@
       }
     </div>
   </div>
-</details>
+</section>

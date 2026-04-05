@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import {
   getVoicingLabelKey,
@@ -15,6 +15,7 @@ import {
 })
 export class VoicingInfoComponent {
   readonly activeStyle = input<VoicingStyle | null>(null);
+  readonly closeRequested = output<void>();
   readonly guides = VOICING_GUIDES;
 
   isActive(guide: VoicingGuideDefinition): boolean {
@@ -23,5 +24,9 @@ export class VoicingInfoComponent {
 
   getActiveLabelKey(): string {
     return this.activeStyle() ? getVoicingLabelKey(this.activeStyle()!) : 'common.unknown';
+  }
+
+  close() {
+    this.closeRequested.emit();
   }
 }

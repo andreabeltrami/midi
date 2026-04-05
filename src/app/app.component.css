@@ -337,25 +337,51 @@ h1 {
   }
 
   .topbar {
-    grid-template-columns: 1fr;
-    justify-items: center;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.45rem;
+    padding: 0.4rem 0.55rem;
   }
 
   .topbar-brand,
   .topbar-center,
-  .topbar-actions,
-  .mode-actions {
-    width: 100%;
-    justify-content: center;
-    justify-self: center;
+  .topbar-actions {
+    width: auto;
   }
 
-  .brand-copy small {
+  .brand-copy {
     display: none;
   }
 
+  .brand-badge {
+    width: 32px;
+    height: 32px;
+    font-size: 0.92rem;
+  }
+
+  .language-pill {
+    padding: 0.15rem;
+  }
+
+  .language-btn {
+    min-height: 30px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.72rem;
+  }
+
   .mode-actions {
-    flex-wrap: wrap;
+    gap: 0.3rem;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+  }
+
+  .menu-link {
+    min-width: 34px;
+    min-height: 34px;
+    padding: 0.25rem;
+  }
+
+  .stage {
+    padding-top: 58px;
   }
 }
 

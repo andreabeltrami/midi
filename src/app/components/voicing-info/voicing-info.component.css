@@ -4,34 +4,50 @@
 
 .voicing-guide-card {
   max-width: 920px;
-  margin: 1rem auto 0;
+  margin: 0;
   text-align: left;
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.03);
+  background: #101b24;
   overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
 }
 
-.voicing-guide-toggle {
-  list-style: none;
-  cursor: pointer;
+.voicing-guide-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 0.8rem 1rem;
-  font-weight: 700;
+  padding: 0.9rem 1rem 0;
 }
 
-.voicing-guide-toggle::-webkit-details-marker {
-  display: none;
+.voicing-guide-title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
 }
 
-.toggle-title {
-  color: #eaf9ff;
+.voicing-guide-title h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.close-btn {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #e8f5fb;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
 }
 
 .toggle-active {
+  width: fit-content;
   font-size: 0.8rem;
   color: #8fded1;
   border: 1px solid rgba(0, 209, 178, 0.26);
@@ -39,15 +55,11 @@
   padding: 0.2rem 0.55rem;
 }
 
-.voicing-guide-card[open] .voicing-guide-toggle {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
 .voicing-guide-content {
   padding: 0.9rem 1rem 1rem;
 }
 
-.voicing-guide-head p {
+.guide-description {
   margin: 0;
   color: #9eb0b9;
 }
@@ -115,12 +127,40 @@
     grid-template-columns: 1fr;
   }
 
-  .voicing-guide-toggle {
-    flex-direction: column;
-    align-items: flex-start;
+  .voicing-guide-item p {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  :host {
+    display: block;
+    width: 100%;
+  }
+
+  .voicing-guide-card {
+    max-height: 70vh;
+    border-radius: 16px 16px 10px 10px;
+    overflow: auto;
+  }
+
+  .voicing-guide-head {
+    position: sticky;
+    top: 0;
+    background: #101b24;
+    z-index: 1;
+    padding-top: 0.8rem;
+  }
+
+  .voicing-guide-content {
+    padding: 0.75rem 0.85rem 0.95rem;
+  }
+
+  .voicing-guide-item {
+    padding: 0.75rem;
   }
 
   .voicing-guide-item p {
-    min-height: 0;
+    font-size: 0.82rem;
   }
 }

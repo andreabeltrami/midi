@@ -44,17 +44,35 @@
         <span class="icon">↺</span> {{ 'common.reset' | t }}
       </button>
 
-      <div class="select-wrapper">
-        <label for="voicing-select">{{ 'play.voicingStyle' | t }}</label>
-        <select id="voicing-select" (change)="onVoicingChange($event)" [disabled]="gameActive()">
-          @for (option of voicingOptions; track option) {
-            <option [value]="option">{{ getVoicingLabelKey(option) | t }}</option>
-          }
-        </select>
+      <div class="voicing-row">
+        <div class="select-wrapper voicing-select">
+          <label for="voicing-select">{{ 'play.voicingStyle' | t }}</label>
+          <div class="voicing-controls">
+            <select id="voicing-select" (change)="onVoicingChange($event)" [disabled]="gameActive()">
+              @for (option of voicingOptions; track option) {
+                <option [value]="option">{{ getVoicingLabelKey(option) | t }}</option>
+              }
+            </select>
+
+            <button
+              type="button"
+              class="info-btn"
+              [class.active]="showVoicingInfo()"
+              (click)="toggleVoicingInfo()"
+              [attr.aria-label]="'voicing.sectionTitle' | t"
+              [attr.title]="'voicing.sectionTitle' | t">
+              ℹ️
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <app-voicing-info [activeStyle]="voicingStyle()"></app-voicing-info>
+    @if (showVoicingInfo()) {
+      <div class="voicing-popover-host">
+        <app-voicing-info [activeStyle]="voicingStyle()" (closeRequested)="hideVoicingInfo()"></app-voicing-info>
+      </div>
+    }
 
     @if (latestResult()) {
       <section class="last-run-card">

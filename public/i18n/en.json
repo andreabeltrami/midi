@@ -23,6 +23,7 @@
     "quality": "Quality",
     "listen": "Listen",
     "reset": "Reset",
+    "close": "Close",
     "unknown": "Unknown",
     "ascending": "Asc",
     "descending": "Desc"

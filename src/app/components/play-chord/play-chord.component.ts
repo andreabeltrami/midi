@@ -32,6 +32,7 @@ export class PlayChordComponent implements OnDestroy {
   currentChordWrong = signal(false);
   currentChordCorrect = signal(false);
   voicingStyle = signal<VoicingStyle>(VoicingStyle.Standard);
+  showVoicingInfo = signal(false);
 
   gameActive = signal(false);
   currentStreak = signal(0);
@@ -130,6 +131,14 @@ export class PlayChordComponent implements OnDestroy {
     this.voicingStyle.set(value);
     this.clearFeedback();
     this.resetPressedNotes();
+  }
+
+  public toggleVoicingInfo() {
+    this.showVoicingInfo.update((value) => !value);
+  }
+
+  public hideVoicingInfo() {
+    this.showVoicingInfo.set(false);
   }
 
   public resetPressedNotes() {

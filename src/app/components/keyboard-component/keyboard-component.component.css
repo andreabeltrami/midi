@@ -66,16 +66,27 @@
 
 /* Mobile Adjustments */
 @media (max-width: 600px) {
-  :host { padding: 0.5rem; }
-  
-  .piano-keyboard { height: 140px; }
-  
-  .white-key { 
-    width: 30px;
-    border-bottom-width: 3px; 
+  :host {
+    display: block;
   }
-  
-  .black-key { width: 18px; margin-left: -9px; margin-right: -9px; }
-  
-  .chord-display { margin-bottom: 1rem; }
+
+  .piano-container {
+    padding: 12px 6px;
+    border-radius: 16px;
+  }
+
+  .piano-keyboard {
+    height: 136px;
+  }
+
+  .white-key {
+    width: 30px;
+    border-bottom-width: 3px;
+  }
+
+  .black-key {
+    width: 18px;
+    margin-left: -9px;
+    margin-right: -9px;
+  }
 }
