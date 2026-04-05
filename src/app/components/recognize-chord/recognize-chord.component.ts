@@ -1,7 +1,7 @@
 import { Component, OnDestroy, signal } from '@angular/core';
 import { ChordType } from '../../enums/chord-type';
 import { Interval } from '../../enums/interval';
-import { NoteType } from '../../enums/note-type';
+import { getNoteLabel, getNoteOptions, NoteType } from '../../enums/note-type';
 import { VoicingStyle } from '../../enums/voicing-style';
 import { ChordDefinition } from '../../types/chord-definition';
 import { Note } from '../../types/note';
@@ -24,12 +24,7 @@ export class RecognizeChordComponent implements OnDestroy {
 
   readonly voicingOptions = Object.values(VoicingStyle);
 
-  readonly noteOptions = Object.keys(NoteType)
-    .filter((key) => isNaN(Number(key)))
-    .map((label) => ({
-      label,
-      value: NoteType[label as keyof typeof NoteType] as NoteType,
-    }));
+  readonly noteOptions = getNoteOptions();
 
   readonly chordTypeOptions = [
     { label: '-7', value: ChordType.Minor7 },
@@ -255,7 +250,7 @@ export class RecognizeChordComponent implements OnDestroy {
   }
 
   private getChordLabel(chord: ChordDefinition): string {
-    const noteName = NoteType[chord.baseNote] ?? '?';
+    const noteName = chord.displayBaseNote ?? getNoteLabel(chord.baseNote);
     const qualityByChordType: Record<ChordType, string> = {
       [ChordType.Minor7]: '-7',
       [ChordType.Perfect7]: '7',

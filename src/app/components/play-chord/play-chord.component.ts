@@ -3,7 +3,7 @@ import { ChordDefinition } from '../../types/chord-definition';
 import { Note } from '../../types/note';
 import { VoicingStyle } from '../../enums/voicing-style';
 import { ChordType } from '../../enums/chord-type';
-import { NoteType } from '../../enums/note-type';
+import { getNoteLabel, NoteType } from '../../enums/note-type';
 import { Interval } from '../../enums/interval';
 import { MidiEventType } from '../../enums/midi-event-type';
 import { PianoKey } from '../../types/piano-key';
@@ -48,7 +48,8 @@ export class PlayChordComponent implements OnDestroy {
       [ChordType.Major7]: 'Maj7',
     };
 
-    return `${NoteType[chord.baseNote]}${qualityByChordType[chord.type] ?? ''}`;
+    const baseNoteLabel = chord.displayBaseNote ?? getNoteLabel(chord.baseNote);
+    return `${baseNoteLabel}${qualityByChordType[chord.type] ?? ''}`;
   });
 
   lastMidiEventType = MidiEventType.Released;
@@ -282,7 +283,7 @@ export class PlayChordComponent implements OnDestroy {
   }
 
   private getChordLabel(chord: ChordDefinition): string {
-    const noteName = NoteType[chord.baseNote] ?? '?';
+    const noteName = chord.displayBaseNote ?? getNoteLabel(chord.baseNote);
     const qualityByChordType: Record<ChordType, string> = {
       [ChordType.Minor7]: '-7',
       [ChordType.Perfect7]: '7',
@@ -416,9 +417,12 @@ export class PlayChordComponent implements OnDestroy {
   }
 
   static generateRandomChord(): ChordDefinition {
+    const baseNote = PlayChordComponent.getRandomEnumValue(NoteType) as NoteType;
+
     return {
-      baseNote: PlayChordComponent.getRandomEnumValue(NoteType),
+      baseNote,
       type: PlayChordComponent.getRandomEnumValue(ChordType),
+      displayBaseNote: getNoteLabel(baseNote, 'random'),
     };
   }
 

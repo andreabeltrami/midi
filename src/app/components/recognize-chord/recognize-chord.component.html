@@ -44,7 +44,7 @@
       <div class="select-wrapper">
         <label for="base-note-select">Base</label>
         <select id="base-note-select" (change)="onBaseNoteChange($event)">
-          @for (option of noteOptions; track option.value) {
+          @for (option of noteOptions; track option.label) {
             <option [value]="option.value">{{ option.label }}</option>
           }
         </select>
