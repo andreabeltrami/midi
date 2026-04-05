@@ -1,4 +1,7 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { getVoicingLabelKey } from '../../enums/voicing-style';
+import { TranslatePipe } from '../../pipes/translate.pipe';
+import { I18nService } from '../../services/i18n.service';
 import { GameRunRecord, TrainerGameType } from '../../types/game-run-record';
 
 type SortField =
@@ -18,21 +21,25 @@ const STORAGE_KEYS: Record<TrainerGameType, string> = {
 
 @Component({
   selector: 'app-result-table',
+  imports: [TranslatePipe],
   templateUrl: './result-table.component.html',
   styleUrl: './result-table.component.css',
 })
 export class ResultTableComponent {
+  private readonly i18n = inject(I18nService);
+
   readonly records = signal<GameRunRecord[]>(this.loadFromStorage());
   readonly searchTerm = signal('');
   readonly selectedVoicing = signal<string>('all');
   readonly selectedTab = signal<ResultsTab>('all');
   readonly sortField = signal<SortField>('elapsedMs');
   readonly sortDirection = signal<SortDirection>('asc');
+  readonly getVoicingLabelKey = getVoicingLabelKey;
 
-  readonly tabs: { label: string; value: ResultsTab }[] = [
-    { label: 'Tutti', value: 'all' },
-    { label: 'Play Chord', value: 'play' },
-    { label: 'Recognize Chord', value: 'recognize' },
+  readonly tabs: { labelKey: string; value: ResultsTab }[] = [
+    { labelKey: 'common.all', value: 'all' },
+    { labelKey: 'app.modes.playTitle', value: 'play' },
+    { labelKey: 'app.modes.recognizeTitle', value: 'recognize' },
   ];
 
   readonly voicingOptions = computed(() => {
@@ -106,11 +113,11 @@ export class ResultTableComponent {
   }
 
   getReadableDate(isoDate: string): string {
-    return new Date(isoDate).toLocaleString('it-IT');
+    return new Date(isoDate).toLocaleString(this.i18n.getLocale());
   }
 
   getGameLabel(gameType: TrainerGameType): string {
-    return gameType === 'play' ? 'Play Chord' : 'Recognize Chord';
+    return this.i18n.t(gameType === 'play' ? 'app.modes.playTitle' : 'app.modes.recognizeTitle');
   }
 
   private loadFromStorage(): GameRunRecord[] {
@@ -167,7 +174,7 @@ export class ResultTableComponent {
       case 'wrongGuesses':
         return record.wrongGuesses;
       case 'voicingStyle':
-        return record.voicingStyle;
+        return this.i18n.t(getVoicingLabelKey(record.voicingStyle));
       case 'gameType':
         return this.getGameLabel(record.gameType);
     }

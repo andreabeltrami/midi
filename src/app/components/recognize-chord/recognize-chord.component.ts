@@ -2,7 +2,7 @@ import { Component, OnDestroy, signal } from '@angular/core';
 import { ChordType } from '../../enums/chord-type';
 import { Interval } from '../../enums/interval';
 import { getNoteLabel, getNoteOptions, NoteType } from '../../enums/note-type';
-import { VoicingStyle } from '../../enums/voicing-style';
+import { getVoicingLabelKey, VoicingStyle } from '../../enums/voicing-style';
 import { ChordDefinition } from '../../types/chord-definition';
 import { Note } from '../../types/note';
 import { PlayChordComponent } from '../play-chord/play-chord.component';
@@ -11,10 +11,12 @@ import { KeyboardService } from '../../services/keyboard.service';
 import * as Tone from 'tone';
 import { getChordVoicingIntervals } from '../../config/chord-voicings';
 import { GameRunRecord } from '../../types/game-run-record';
+import { TranslatePipe } from '../../pipes/translate.pipe';
+import { VoicingInfoComponent } from '../voicing-info/voicing-info.component';
 
 @Component({
   selector: 'app-recognize-chord',
-  imports: [KeyboardComponentComponent],
+  imports: [KeyboardComponentComponent, TranslatePipe, VoicingInfoComponent],
   templateUrl: './recognize-chord.component.html',
   styleUrl: './recognize-chord.component.css',
 })
@@ -23,6 +25,7 @@ export class RecognizeChordComponent implements OnDestroy {
   private static readonly TARGET_STREAK = 5;
 
   readonly voicingOptions = Object.values(VoicingStyle);
+  protected readonly getVoicingLabelKey = getVoicingLabelKey;
 
   readonly noteOptions = getNoteOptions();
 

@@ -232,7 +232,6 @@ select {
 }
 
 .play-btn {
-  width: 44px;
   min-height: 44px;
   border-radius: 12px;
   border: 1px solid #2e4e51;
@@ -241,11 +240,20 @@ select {
   font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0 0.8rem;
 }
 
 .play-btn:hover {
   border-color: #00adb5;
   color: #ffffff;
+}
+
+.play-btn-text {
+  font-size: 0.84rem;
 }
 
 @media (max-width: 720px) {

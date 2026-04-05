@@ -1,0 +1,116 @@
+{
+  "language": {
+    "label": "Language",
+    "it": "Italian",
+    "en": "English"
+  },
+  "common": {
+    "all": "All",
+    "game": "Game",
+    "date": "Date",
+    "time": "Time",
+    "attempts": "Attempts",
+    "errors": "Errors",
+    "voicing": "Voicing",
+    "chords": "Chords",
+    "search": "Search",
+    "sort": "Sort by",
+    "confirm": "Confirm",
+    "correct": "Correct",
+    "retry": "Try again",
+    "hiddenChord": "Hidden chord",
+    "base": "Root",
+    "quality": "Quality",
+    "listen": "Listen",
+    "reset": "Reset",
+    "unknown": "Unknown",
+    "ascending": "Asc",
+    "descending": "Desc"
+  },
+  "app": {
+    "eyebrow": "Interactive lab",
+    "tagline": "Ear training and voicing practice",
+    "description": "Choose how to train",
+    "modeSelector": "Mode selector",
+    "mainMenu": "Main menu",
+    "home": "Back to home",
+    "modes": {
+      "playTitle": "Play chord",
+      "playCopy": "Play the requested chord on your keyboard",
+      "playTag": "Ear",
+      "recognizeTitle": "Recognize chord",
+      "recognizeCopy": "Listen to or inspect the voicing and guess chord and quality",
+      "recognizeTag": "Theory",
+      "leaderboardTitle": "Leaderboard"
+    }
+  },
+  "play": {
+    "label": "Play chord",
+    "start": "Start challenge ({target} correct)",
+    "abort": "Stop",
+    "streak": "Streak",
+    "timer": "Time",
+    "attempts": "Attempts",
+    "voicingStyle": "Voicing style",
+    "lastResultTitle": "Latest result",
+    "lastResult": "You completed the challenge in {time} with {attempts} attempts and {errors} mistakes."
+  },
+  "recognize": {
+    "label": "Recognize chord",
+    "start": "Start challenge ({target} correct)",
+    "abort": "Stop",
+    "streak": "Streak",
+    "timer": "Time",
+    "attempts": "Attempts",
+    "changeChord": "Change chord",
+    "voicingStyle": "Voicing style",
+    "listenToChord": "Listen to the chord",
+    "lastResultTitle": "Latest result",
+    "lastResult": "You completed the challenge in {time} with {attempts} attempts."
+  },
+  "results": {
+    "title": "Results table",
+    "description": "Complete local history of Play Chord and Recognize Chord.",
+    "gameFilter": "Game filter",
+    "filterVoicing": "Filter voicing",
+    "searchPlaceholder": "Chord, game or date",
+    "empty": "No results match the selected filters.",
+    "columns": {
+      "rank": "#",
+      "game": "Game",
+      "date": "Date",
+      "time": "Time",
+      "attempts": "Attempts",
+      "errors": "Errors",
+      "voicing": "Voicing",
+      "chords": "Chords"
+    },
+    "sortOptions": {
+      "time": "Time",
+      "date": "Date",
+      "game": "Game",
+      "attempts": "Attempts",
+      "errors": "Errors",
+      "voicing": "Voicing"
+    }
+  },
+  "voicing": {
+    "sectionTitle": "Voicing guide",
+    "sectionDescription": "A quick reference to understand how to build each available voicing.",
+    "minor7": "Min7",
+    "dominant7": "7",
+    "major7": "Maj7",
+    "standard": {
+      "name": "Standard",
+      "summary": "Classic rootless voicing built around the 3rd and 7th."
+    },
+    "billEvans": {
+      "name": "Bill Evans (rootless)",
+      "summary": "More open and modern color, using the 13th/6th where available."
+    },
+    "base": {
+      "name": "With root",
+      "summary": "Includes the root for a more direct construction."
+    }
+  }
+}

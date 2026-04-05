@@ -1,11 +1,11 @@
 <section class="results-table-card">
   <header class="results-head">
     <div>
-      <h3>Result Table</h3>
-      <p>Storico completo di `Play Chord` e `Recognize Chord`, salvato in locale.</p>
+      <h3>{{ 'results.title' | t }}</h3>
+      <p>{{ 'results.description' | t }}</p>
     </div>
 
-    <div class="tabs-row" role="tablist" aria-label="Filtro gioco">
+    <div class="tabs-row" role="tablist" [attr.aria-label]="'results.gameFilter' | t">
       @for (tab of tabs; track tab.value) {
         <button
           class="tab-btn"
@@ -14,40 +14,40 @@
           [class.active]="selectedTab() === tab.value"
           [attr.aria-selected]="selectedTab() === tab.value"
           (click)="setTab(tab.value)">
-          {{ tab.label }}
+          {{ tab.labelKey | t }}
         </button>
       }
     </div>
 
     <div class="filters-row">
       <label>
-        <span>Filtra voicing</span>
+        <span>{{ 'results.filterVoicing' | t }}</span>
         <select (change)="setVoicingFilter($event)">
           @for (voicing of voicingOptions(); track voicing) {
-            <option [value]="voicing">{{ voicing === 'all' ? 'Tutti' : voicing }}</option>
+            <option [value]="voicing">{{ voicing === 'all' ? ('common.all' | t) : (getVoicingLabelKey(voicing) | t) }}</option>
           }
         </select>
       </label>
 
       <label>
-        <span>Cerca</span>
-        <input type="text" placeholder="Accordo, gioco o data" (input)="setSearchTerm($event)" />
+        <span>{{ 'common.search' | t }}</span>
+        <input type="text" [placeholder]="'results.searchPlaceholder' | t" (input)="setSearchTerm($event)" />
       </label>
 
       <label>
-        <span>Ordina per</span>
+        <span>{{ 'common.sort' | t }}</span>
         <select (change)="setSortField($event)">
-          <option value="elapsedMs">Tempo</option>
-          <option value="completedAtIso">Data</option>
-          <option value="gameType">Gioco</option>
-          <option value="totalGuesses">Tentativi</option>
-          <option value="wrongGuesses">Errori</option>
-          <option value="voicingStyle">Voicing</option>
+          <option value="elapsedMs">{{ 'results.sortOptions.time' | t }}</option>
+          <option value="completedAtIso">{{ 'results.sortOptions.date' | t }}</option>
+          <option value="gameType">{{ 'results.sortOptions.game' | t }}</option>
+          <option value="totalGuesses">{{ 'results.sortOptions.attempts' | t }}</option>
+          <option value="wrongGuesses">{{ 'results.sortOptions.errors' | t }}</option>
+          <option value="voicingStyle">{{ 'results.sortOptions.voicing' | t }}</option>
         </select>
       </label>
 
       <button class="sort-direction-btn" (click)="toggleSortDirection()" type="button">
-        {{ sortDirection() === 'asc' ? 'Asc' : 'Desc' }}
+        {{ sortDirection() === 'asc' ? ('common.ascending' | t) : ('common.descending' | t) }}
       </button>
     </div>
   </header>
@@ -56,14 +56,14 @@
     <table>
       <thead>
         <tr>
-          <th>#</th>
-          <th>Gioco</th>
-          <th>Data</th>
-          <th>Tempo</th>
-          <th>Tentativi</th>
-          <th>Errori</th>
-          <th>Voicing</th>
-          <th>Accordi</th>
+          <th>{{ 'results.columns.rank' | t }}</th>
+          <th>{{ 'results.columns.game' | t }}</th>
+          <th>{{ 'results.columns.date' | t }}</th>
+          <th>{{ 'results.columns.time' | t }}</th>
+          <th>{{ 'results.columns.attempts' | t }}</th>
+          <th>{{ 'results.columns.errors' | t }}</th>
+          <th>{{ 'results.columns.voicing' | t }}</th>
+          <th>{{ 'results.columns.chords' | t }}</th>
         </tr>
       </thead>
       <tbody>
@@ -75,12 +75,12 @@
             <td>{{ getElapsedLabelFromMs(entry.elapsedMs) }}</td>
             <td>{{ entry.totalGuesses }}</td>
             <td>{{ entry.wrongGuesses }}</td>
-            <td>{{ entry.voicingStyle }}</td>
+            <td>{{ getVoicingLabelKey(entry.voicingStyle) | t }}</td>
             <td>{{ entry.guessedChords.join(' · ') }}</td>
           </tr>
         } @empty {
           <tr>
-            <td class="empty" colspan="8">Nessun risultato per i filtri selezionati.</td>
+            <td class="empty" colspan="8">{{ 'results.empty' | t }}</td>
           </tr>
         }
       </tbody>

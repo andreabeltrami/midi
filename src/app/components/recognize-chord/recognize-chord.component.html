@@ -1,28 +1,28 @@
 <div class="app-container">
   <div class="chord-display">
-    <span class="chord-label">Recognize Chord</span>
+    <span class="chord-label">{{ 'recognize.label' | t }}</span>
 
     <div class="challenge-bar">
       <div class="challenge-stats">
         <p class="challenge-item">
-          <span>Streak</span>
+          <span>{{ 'recognize.streak' | t }}</span>
           <strong>{{ currentStreak() }}/{{ targetStreak }}</strong>
         </p>
         <p class="challenge-item">
-          <span>Tempo</span>
+          <span>{{ 'recognize.timer' | t }}</span>
           <strong>{{ getElapsedLabel(elapsedSeconds()) }}</strong>
         </p>
         <p class="challenge-item">
-          <span>Tentativi</span>
+          <span>{{ 'recognize.attempts' | t }}</span>
           <strong>{{ totalGuesses() }}</strong>
         </p>
       </div>
 
       <div class="challenge-actions">
         @if (gameActive()) {
-          <button class="challenge-btn secondary" (click)="abortChallenge()">Interrompi</button>
+          <button class="challenge-btn secondary" (click)="abortChallenge()">{{ 'recognize.abort' | t }}</button>
         } @else {
-          <button class="challenge-btn" (click)="startChallenge()">Avvia sfida ({{this.targetStreak}} corretti)</button>
+          <button class="challenge-btn" (click)="startChallenge()">{{ 'recognize.start' | t:{ target: targetStreak } }}</button>
         }
       </div>
     </div>
@@ -32,17 +32,17 @@
       [class.wrong]="currentChordWrong()"
       [class.correct]="currentChordCorrect()">
       @if (currentChordCorrect()) {
-        Corretto
+        {{ 'common.correct' | t }}
       } @else if (currentChordWrong()) {
-        Riprova
+        {{ 'common.retry' | t }}
       } @else {
-        Accordo nascosto
+        {{ 'common.hiddenChord' | t }}
       }
     </h2>
 
     <div class="guess-panel">
       <div class="select-wrapper">
-        <label for="base-note-select">Base</label>
+        <label for="base-note-select">{{ 'common.base' | t }}</label>
         <select id="base-note-select" (change)="onBaseNoteChange($event)">
           @for (option of noteOptions; track option.label) {
             <option [value]="option.value">{{ option.label }}</option>
@@ -51,7 +51,7 @@
       </div>
 
       <div class="select-wrapper">
-        <label for="quality-select">Qualità</label>
+        <label for="quality-select">{{ 'common.quality' | t }}</label>
         <select id="quality-select" (change)="onChordTypeChange($event)">
           @for (option of chordTypeOptions; track option.value) {
             <option [value]="option.value">{{ option.label }}</option>
@@ -60,35 +60,43 @@
       </div>
 
       <div class="guess-actions">
-        <button class="play-btn" (click)="playCurrentChordPreview()" aria-label="Suona accordo">
-          <span aria-hidden="true">&#127908;</span>
+        <button
+          class="play-btn"
+          (click)="playCurrentChordPreview()"
+          [attr.aria-label]="'recognize.listenToChord' | t"
+          [attr.title]="'recognize.listenToChord' | t">
+          <span aria-hidden="true">🔊</span>
+          <span class="play-btn-text">{{ 'common.listen' | t }}</span>
         </button>
-        <button class="confirm-btn" (click)="submitGuess()">OK</button>
+        <button class="confirm-btn" (click)="submitGuess()">{{ 'common.confirm' | t }}</button>
       </div>
     </div>
 
     <div class="selection-container">
       <button class="reset-btn" (click)="changeChord()" [disabled]="gameActive()">
-        <span class="icon">↺</span> Cambia Accordo
+        <span class="icon">↺</span> {{ 'recognize.changeChord' | t }}
       </button>
 
       <div class="select-wrapper">
-        <label for="voicing-select">Voicing Style</label>
+        <label for="voicing-select">{{ 'recognize.voicingStyle' | t }}</label>
         <select id="voicing-select" (change)="onVoicingChange($event)" [disabled]="gameActive()">
           @for (option of voicingOptions; track option) {
-            <option [value]="option">{{ option }}</option>
+            <option [value]="option">{{ getVoicingLabelKey(option) | t }}</option>
           }
         </select>
       </div>
     </div>
 
+    <app-voicing-info [activeStyle]="voicingStyle()"></app-voicing-info>
+
     @if (latestResult()) {
       <section class="last-run-card">
-        <h3>Ultimo risultato</h3>
+        <h3>{{ 'recognize.lastResultTitle' | t }}</h3>
         <p>
-          Hai completato la sfida in
-          <strong>{{ getElapsedLabelFromMs(latestResult()!.elapsedMs) }}</strong>
-          con <strong>{{ latestResult()!.totalGuesses }}</strong> tentativi.
+          {{ 'recognize.lastResult' | t:{
+            time: getElapsedLabelFromMs(latestResult()!.elapsedMs),
+            attempts: latestResult()!.totalGuesses
+          } }}
         </p>
       </section>
     }

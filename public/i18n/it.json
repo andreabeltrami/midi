@@ -1,0 +1,116 @@
+{
+  "language": {
+    "label": "Lingua",
+    "it": "Italiano",
+    "en": "Inglese"
+  },
+  "common": {
+    "all": "Tutti",
+    "game": "Gioco",
+    "date": "Data",
+    "time": "Tempo",
+    "attempts": "Tentativi",
+    "errors": "Errori",
+    "voicing": "Voicing",
+    "chords": "Accordi",
+    "search": "Cerca",
+    "sort": "Ordina per",
+    "confirm": "Conferma",
+    "correct": "Corretto",
+    "retry": "Riprova",
+    "hiddenChord": "Accordo nascosto",
+    "base": "Base",
+    "quality": "Qualità",
+    "listen": "Ascolta",
+    "reset": "Reset",
+    "unknown": "Sconosciuto",
+    "ascending": "Asc",
+    "descending": "Desc"
+  },
+  "app": {
+    "eyebrow": "Laboratorio interattivo",
+    "tagline": "Ear training e pratica sui voicing",
+    "description": "Scegli come allenarti",
+    "modeSelector": "Selettore modalità",
+    "mainMenu": "Menu principale",
+    "home": "Torna all'inizio",
+    "modes": {
+      "playTitle": "Suona l'accordo",
+      "playCopy": "Suona l'accordo richiesto sulla tastiera",
+      "playTag": "Ear",
+      "recognizeTitle": "Riconosci l'accordo",
+      "recognizeCopy": "Ascolta o guarda il voicing e indovina accordo e qualità",
+      "recognizeTag": "Theory",
+      "leaderboardTitle": "Classifica"
+    }
+  },
+  "play": {
+    "label": "Suona accordo",
+    "start": "Avvia sfida ({target} corretti)",
+    "abort": "Interrompi",
+    "streak": "Streak",
+    "timer": "Tempo",
+    "attempts": "Tentativi",
+    "voicingStyle": "Stile voicing",
+    "lastResultTitle": "Ultimo risultato",
+    "lastResult": "Hai completato la sfida in {time} con {attempts} tentativi e {errors} errori."
+  },
+  "recognize": {
+    "label": "Riconosci accordo",
+    "start": "Avvia sfida ({target} corretti)",
+    "abort": "Interrompi",
+    "streak": "Streak",
+    "timer": "Tempo",
+    "attempts": "Tentativi",
+    "changeChord": "Cambia accordo",
+    "voicingStyle": "Stile voicing",
+    "listenToChord": "Ascolta l'accordo",
+    "lastResultTitle": "Ultimo risultato",
+    "lastResult": "Hai completato la sfida in {time} con {attempts} tentativi."
+  },
+  "results": {
+    "title": "Tabella risultati",
+    "description": "Storico completo di Play Chord e Recognize Chord, salvato in locale.",
+    "gameFilter": "Filtro gioco",
+    "filterVoicing": "Filtra voicing",
+    "searchPlaceholder": "Accordo, gioco o data",
+    "empty": "Nessun risultato per i filtri selezionati.",
+    "columns": {
+      "rank": "#",
+      "game": "Gioco",
+      "date": "Data",
+      "time": "Tempo",
+      "attempts": "Tentativi",
+      "errors": "Errori",
+      "voicing": "Voicing",
+      "chords": "Accordi"
+    },
+    "sortOptions": {
+      "time": "Tempo",
+      "date": "Data",
+      "game": "Gioco",
+      "attempts": "Tentativi",
+      "errors": "Errori",
+      "voicing": "Voicing"
+    }
+  },
+  "voicing": {
+    "sectionTitle": "Guida ai voicing",
+    "sectionDescription": "Una panoramica rapida per capire come costruire i voicing disponibili.",
+    "minor7": "Min7",
+    "dominant7": "7",
+    "major7": "Maj7",
+    "standard": {
+      "name": "Standard",
+      "summary": "Voicing rootless classico, centrato su 3ª e 7ª."
+    },
+    "billEvans": {
+      "name": "Bill Evans (rootless)",
+      "summary": "Suono più aperto e moderno, con 13ª/6ª dove previsto."
+    },
+    "base": {
+      "name": "Con tonica",
+      "summary": "Include la fondamentale per una costruzione più diretta."
+    }
+  }
+}

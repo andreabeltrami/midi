@@ -1,0 +1,126 @@
+:host {
+  display: block;
+}
+
+.voicing-guide-card {
+  max-width: 920px;
+  margin: 1rem auto 0;
+  text-align: left;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+  overflow: hidden;
+}
+
+.voicing-guide-toggle {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.8rem 1rem;
+  font-weight: 700;
+}
+
+.voicing-guide-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.toggle-title {
+  color: #eaf9ff;
+}
+
+.toggle-active {
+  font-size: 0.8rem;
+  color: #8fded1;
+  border: 1px solid rgba(0, 209, 178, 0.26);
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+}
+
+.voicing-guide-card[open] .voicing-guide-toggle {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.voicing-guide-content {
+  padding: 0.9rem 1rem 1rem;
+}
+
+.voicing-guide-head p {
+  margin: 0;
+  color: #9eb0b9;
+}
+
+.voicing-guide-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin-top: 0.9rem;
+}
+
+.voicing-guide-item {
+  padding: 0.9rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(9, 18, 25, 0.55);
+}
+
+.voicing-guide-item.active {
+  border-color: rgba(0, 209, 178, 0.9);
+  box-shadow: inset 0 0 0 1px rgba(0, 209, 178, 0.18);
+}
+
+.voicing-guide-item h4 {
+  margin: 0;
+  font-size: 0.98rem;
+}
+
+.voicing-guide-item p {
+  margin: 0.35rem 0 0.75rem;
+  color: #aabac4;
+  min-height: 40px;
+  font-size: 0.88rem;
+}
+
+.voicing-guide-item ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.voicing-guide-item li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.voicing-guide-item span {
+  color: #9cc9d2;
+  font-weight: 700;
+}
+
+.voicing-guide-item strong {
+  color: #eef7fb;
+  font-size: 0.82rem;
+  text-align: right;
+}
+
+@media (max-width: 860px) {
+  .voicing-guide-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .voicing-guide-toggle {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .voicing-guide-item p {
+    min-height: 0;
+  }
+}

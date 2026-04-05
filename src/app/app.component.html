@@ -1,73 +1,106 @@
 <div class="app-shell">
+  <header class="topbar" role="navigation" [attr.aria-label]="'app.mainMenu' | t">
+    <div class="topbar-brand">
+      <span class="brand-badge icon-glyph" aria-hidden="true">♫</span>
+      <div class="brand-copy">
+        <strong>MIDI Trainer</strong>
+        <small>{{ 'app.tagline' | t }}</small>
+      </div>
+    </div>
+
+    <div class="topbar-center">
+      <div class="language-pill" role="group" [attr.aria-label]="'language.label' | t">
+        <button
+          type="button"
+          class="language-btn"
+          [class.active]="i18n.language() === 'it'"
+          (click)="setLanguage('it')"
+          [attr.aria-pressed]="i18n.language() === 'it'"
+          [attr.title]="'language.it' | t">
+          <span aria-hidden="true">🇮🇹</span>
+          <span>IT</span>
+        </button>
+        <button
+          type="button"
+          class="language-btn"
+          [class.active]="i18n.language() === 'en'"
+          (click)="setLanguage('en')"
+          [attr.aria-pressed]="i18n.language() === 'en'"
+          [attr.title]="'language.en' | t">
+          <span aria-hidden="true">🇬🇧</span>
+          <span>EN</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      @if (selectedMode() !== null) {
+        <div class="mode-actions">
+          <button
+            class="menu-link icon-link"
+            [class.active]="selectedMode() === 'play'"
+            (click)="selectMode('play')"
+            [attr.aria-label]="'app.modes.playTitle' | t"
+            [attr.title]="'app.modes.playTitle' | t">
+            <span class="icon-glyph" aria-hidden="true">🎹</span>
+          </button>
+          <button
+            class="menu-link icon-link"
+            [class.active]="selectedMode() === 'recognize'"
+            (click)="selectMode('recognize')"
+            [attr.aria-label]="'app.modes.recognizeTitle' | t"
+            [attr.title]="'app.modes.recognizeTitle' | t">
+            <span class="icon-glyph" aria-hidden="true">🎧</span>
+          </button>
+          <button
+            class="menu-link icon-link"
+            [class.active]="selectedMode() === 'leaderboard'"
+            (click)="selectMode('leaderboard')"
+            [attr.aria-label]="'app.modes.leaderboardTitle' | t"
+            [attr.title]="'app.modes.leaderboardTitle' | t">
+            <span class="icon-glyph" aria-hidden="true">🏆</span>
+          </button>
+          <button
+            class="menu-link icon-link ghost"
+            (click)="resetModeSelection()"
+            [attr.aria-label]="'app.home' | t"
+            [attr.title]="'app.home' | t">
+            <span class="icon-glyph" aria-hidden="true">🏠</span>
+          </button>
+        </div>
+      }
+    </div>
+  </header>
+
   @if (selectedMode() === null) {
     <section class="landing-screen">
       <div class="landing-orb" aria-hidden="true"></div>
 
-      <p class="eyebrow">Interactive Lab</p>
+      <p class="eyebrow">{{ 'app.eyebrow' | t }}</p>
       <h1>MIDI Trainer</h1>
-      <p class="description">Scegli come allenarti</p>
+      <p class="description">{{ 'app.description' | t }}</p>
 
-      <div class="landing-actions" role="navigation" aria-label="Game mode selector">
+      <div class="landing-actions" role="navigation" [attr.aria-label]="'app.modeSelector' | t">
         <button class="hero-mode" (click)="selectMode('play')">
           <span class="hero-icon" aria-hidden="true">🎹</span>
           <span class="hero-content">
-            <span class="hero-title">Play Chord</span>
-            <span class="hero-copy">Suona l'accordo richiesto sulla tastiera</span>
+            <span class="hero-title">{{ 'app.modes.playTitle' | t }}</span>
+            <span class="hero-copy">{{ 'app.modes.playCopy' | t }}</span>
           </span>
-          <span class="hero-tag">Ear</span>
+          <span class="hero-tag">{{ 'app.modes.playTag' | t }}</span>
         </button>
 
         <button class="hero-mode" (click)="selectMode('recognize')">
           <span class="hero-icon" aria-hidden="true">🎧</span>
           <span class="hero-content">
-            <span class="hero-title">Recognize Chord</span>
-            <span class="hero-copy">Guarda il voicing e indovina accordo e qualita</span>
+            <span class="hero-title">{{ 'app.modes.recognizeTitle' | t }}</span>
+            <span class="hero-copy">{{ 'app.modes.recognizeCopy' | t }}</span>
           </span>
-          <span class="hero-tag">Theory</span>
+          <span class="hero-tag">{{ 'app.modes.recognizeTag' | t }}</span>
         </button>
       </div>
     </section>
   } @else {
-    <header class="topbar" role="navigation" aria-label="Main menu">
-      <div class="topbar-brand" aria-hidden="true">
-        <span class="brand-badge icon-glyph">♫</span>
-      </div>
-
-      <div class="topbar-actions">
-        <button
-          class="menu-link icon-link"
-          [class.active]="selectedMode() === 'play'"
-          (click)="selectMode('play')"
-          aria-label="Play Chord"
-          title="Play Chord">
-          <span class="icon-glyph" aria-hidden="true">🎹</span>
-        </button>
-        <button
-          class="menu-link icon-link"
-          [class.active]="selectedMode() === 'recognize'"
-          (click)="selectMode('recognize')"
-          aria-label="Recognize Chord"
-          title="Recognize Chord">
-          <span class="icon-glyph" aria-hidden="true">🎧</span>
-        </button>
-        <button
-          class="menu-link icon-link"
-          [class.active]="selectedMode() === 'leaderboard'"
-          (click)="selectMode('leaderboard')"
-          aria-label="Classifica"
-          title="Classifica">
-          <span class="icon-glyph" aria-hidden="true">🏆</span>
-        </button>
-        <button
-          class="menu-link icon-link ghost"
-          (click)="resetModeSelection()"
-          aria-label="Torna all'inizio"
-          title="Torna all'inizio">
-          <span class="icon-glyph" aria-hidden="true">🏠</span>
-        </button>
-      </div>
-    </header>
-
     <main class="stage">
       @if (selectedMode() === 'play') {
         <app-play-chord></app-play-chord>

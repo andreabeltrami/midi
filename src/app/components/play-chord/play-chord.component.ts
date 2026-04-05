@@ -1,7 +1,7 @@
 import { Component, computed, OnDestroy, signal } from '@angular/core';
 import { ChordDefinition } from '../../types/chord-definition';
 import { Note } from '../../types/note';
-import { VoicingStyle } from '../../enums/voicing-style';
+import { getVoicingLabelKey, VoicingStyle } from '../../enums/voicing-style';
 import { ChordType } from '../../enums/chord-type';
 import { getNoteLabel, NoteType } from '../../enums/note-type';
 import { Interval } from '../../enums/interval';
@@ -12,10 +12,12 @@ import { KeyboardService } from '../../services/keyboard.service';
 import { KeyboardComponentComponent } from '../keyboard-component/keyboard-component.component';
 import { getChordVoicingIntervals } from '../../config/chord-voicings';
 import { GameRunRecord } from '../../types/game-run-record';
+import { TranslatePipe } from '../../pipes/translate.pipe';
+import { VoicingInfoComponent } from '../voicing-info/voicing-info.component';
 
 @Component({
   selector: 'app-play-chord',
-  imports: [KeyboardComponentComponent],
+  imports: [KeyboardComponentComponent, TranslatePipe, VoicingInfoComponent],
   templateUrl: './play-chord.component.html',
   styleUrl: './play-chord.component.css',
 })
@@ -24,6 +26,7 @@ export class PlayChordComponent implements OnDestroy {
   private static readonly TARGET_STREAK = 5;
 
   readonly voicingOptions = Object.values(VoicingStyle);
+  protected readonly getVoicingLabelKey = getVoicingLabelKey;
 
   currentChord = signal<ChordDefinition>(PlayChordComponent.generateRandomChord());
   currentChordWrong = signal(false);

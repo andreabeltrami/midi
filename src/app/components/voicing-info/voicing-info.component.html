@@ -1,0 +1,32 @@
+<details class="voicing-guide-card">
+  <summary class="voicing-guide-toggle">
+    <span class="toggle-title">ℹ️ {{ 'voicing.sectionTitle' | t }}</span>
+    @if (activeStyle()) {
+      <span class="toggle-active">{{ getActiveLabelKey() | t }}</span>
+    }
+  </summary>
+
+  <div class="voicing-guide-content">
+    <header class="voicing-guide-head">
+      <p>{{ 'voicing.sectionDescription' | t }}</p>
+    </header>
+
+    <div class="voicing-guide-grid">
+      @for (guide of guides; track guide.style) {
+        <article class="voicing-guide-item" [class.active]="isActive(guide)">
+          <h4>{{ guide.labelKey | t }}</h4>
+          <p>{{ guide.summaryKey | t }}</p>
+
+          <ul>
+            @for (chord of guide.chordFormulas; track chord.chordTypeKey) {
+              <li>
+                <span>{{ chord.chordTypeKey | t }}</span>
+                <strong>{{ chord.formula }}</strong>
+              </li>
+            }
+          </ul>
+        </article>
+      }
+    </div>
+  </div>
+</details>
