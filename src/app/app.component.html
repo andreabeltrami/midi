@@ -54,6 +54,14 @@
           </button>
           <button
             class="menu-link icon-link"
+            [class.active]="selectedMode() === 'degree'"
+            (click)="selectMode('degree')"
+            [attr.aria-label]="'app.modes.degreeTitle' | t"
+            [attr.title]="'app.modes.degreeTitle' | t">
+            <span class="icon-glyph" aria-hidden="true">📍</span>
+          </button>
+          <button
+            class="menu-link icon-link"
             [class.active]="selectedMode() === 'leaderboard'"
             (click)="selectMode('leaderboard')"
             [attr.aria-label]="'app.modes.leaderboardTitle' | t"
@@ -98,6 +106,15 @@
           </span>
           <span class="hero-tag">{{ 'app.modes.recognizeTag' | t }}</span>
         </button>
+
+        <button class="hero-mode" (click)="selectMode('degree')">
+          <span class="hero-icon" aria-hidden="true">📍</span>
+          <span class="hero-content">
+            <span class="hero-title">{{ 'app.modes.degreeTitle' | t }}</span>
+            <span class="hero-copy">{{ 'app.modes.degreeCopy' | t }}</span>
+          </span>
+          <span class="hero-tag">{{ 'app.modes.degreeTag' | t }}</span>
+        </button>
       </div>
     </section>
   } @else {
@@ -106,6 +123,8 @@
         <app-play-chord></app-play-chord>
       } @else if (selectedMode() === 'recognize') {
         <app-recognize-chord></app-recognize-chord>
+      } @else if (selectedMode() === 'degree') {
+        <app-play-degree></app-play-degree>
       } @else if (selectedMode() === 'leaderboard') {
         <div class="leaderboard-page">
           <app-result-table></app-result-table>

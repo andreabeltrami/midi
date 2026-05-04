@@ -17,6 +17,7 @@ type ResultsTab = 'all' | TrainerGameType;
 const STORAGE_KEYS: Record<TrainerGameType, string> = {
   play: 'play-chord-leaderboard-v1',
   recognize: 'recognize-chord-leaderboard-v1',
+  degree: 'play-degree-leaderboard-v1',
 };
 
 @Component({

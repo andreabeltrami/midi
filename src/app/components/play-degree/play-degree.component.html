@@ -1,0 +1,96 @@
+<div class="app-container">
+  <div class="chord-display">
+    <span class="chord-label">{{ 'playDegree.label' | t }}</span>
+
+    <div class="mode-toggle">
+      <button
+        type="button"
+        class="toggle-btn"
+        [class.active]="playMode() === 'chord'"
+        (click)="selectMode('chord')"
+        [disabled]="gameActive()">
+        {{ 'playDegree.modeChord' | t }}
+      </button>
+      <button
+        type="button"
+        class="toggle-btn"
+        [class.active]="playMode() === 'major'"
+        (click)="selectMode('major')"
+        [disabled]="gameActive()">
+        {{ 'playDegree.modeMajor' | t }}
+      </button>
+      <button
+        type="button"
+        class="toggle-btn"
+        [class.active]="playMode() === 'modes'"
+        (click)="selectMode('modes')"
+        [disabled]="gameActive()">
+        {{ 'playDegree.modeModes' | t }}
+      </button>
+    </div>
+
+    <div class="challenge-bar">
+      <div class="challenge-stats">
+        <p class="challenge-item">
+          <span>{{ 'playDegree.streak' | t }}</span>
+          <strong>{{ currentStreak() }}/{{ targetStreak }}</strong>
+        </p>
+        <p class="challenge-item">
+          <span>{{ 'playDegree.timer' | t }}</span>
+          <strong>{{ getElapsedLabel(elapsedSeconds()) }}</strong>
+        </p>
+        <p class="challenge-item">
+          <span>{{ 'playDegree.attempts' | t }}</span>
+          <strong>{{ totalGuesses() }}</strong>
+        </p>
+      </div>
+
+      <div class="challenge-actions">
+        @if (gameActive()) {
+          <button class="challenge-btn secondary" (click)="abortChallenge()">{{ 'playDegree.abort' | t }}</button>
+        } @else {
+          <button class="challenge-btn" (click)="startChallenge()">
+            {{ 'playDegree.start' | t:{ target: targetStreak } }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="degree-display">
+      <h2 class="chord-name" [class.wrong]="currentChordWrong()" [class.correct]="currentChordCorrect()">
+        @if (currentChordCorrect()) {
+          {{ 'common.correct' | t }}
+        } @else if (currentChordWrong()) {
+          {{ 'common.retry' | t }}
+        } @else {
+          {{ displayLabel() }}
+        }
+      </h2>
+
+      <div class="degree-badge" [class.wrong]="currentChordWrong()" [class.correct]="currentChordCorrect()">
+        {{ currentDegreeLabel() }}
+      </div>
+    </div>
+
+    <div class="selection-container">
+      <button class="reset-btn" (click)="resetPressedNotes()">
+        <span class="icon">↺</span> {{ 'common.reset' | t }}
+      </button>
+    </div>
+
+    @if (latestResult()) {
+      <section class="last-run-card">
+        <h3>{{ 'playDegree.lastResultTitle' | t }}</h3>
+        <p>
+          {{ 'playDegree.lastResult' | t:{
+            time: getElapsedLabelFromMs(latestResult()!.elapsedMs),
+            attempts: latestResult()!.totalGuesses,
+            errors: latestResult()!.wrongGuesses
+          } }}
+        </p>
+      </section>
+    }
+  </div>
+
+  <app-keyboard-component></app-keyboard-component>
+</div>

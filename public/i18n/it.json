@@ -42,6 +42,9 @@
       "recognizeTitle": "Riconosci l'accordo",
       "recognizeCopy": "Ascolta o guarda il voicing e indovina accordo e qualità",
       "recognizeTag": "Theory",
+      "degreeTitle": "Suona il grado",
+      "degreeCopy": "Ascolta il grado e suona la nota corretta dell'accordo",
+      "degreeTag": "Intervalli",
       "leaderboardTitle": "Classifica"
     }
   },
@@ -68,6 +71,19 @@
     "listenToChord": "Ascolta l'accordo",
     "lastResultTitle": "Ultimo risultato",
     "lastResult": "Hai completato la sfida in {time} con {attempts} tentativi."
+  },
+  "playDegree": {
+    "label": "Suona il grado",
+    "modeChord": "Accordo",
+    "modeMajor": "Scala Maggiore",
+    "modeModes": "Modi",
+    "start": "Avvia sfida ({target} corretti)",
+    "abort": "Interrompi",
+    "streak": "Streak",
+    "timer": "Tempo",
+    "attempts": "Tentativi",
+    "lastResultTitle": "Ultimo risultato",
+    "lastResult": "Hai completato la sfida in {time} con {attempts} tentativi e {errors} errori."
   },
   "results": {
     "title": "Tabella risultati",

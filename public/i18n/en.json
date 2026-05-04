@@ -42,6 +42,9 @@
       "recognizeTitle": "Recognize chord",
       "recognizeCopy": "Listen to or inspect the voicing and guess chord and quality",
       "recognizeTag": "Theory",
+      "degreeTitle": "Play degree",
+      "degreeCopy": "Hear the degree and play the correct chord tone",
+      "degreeTag": "Intervals",
       "leaderboardTitle": "Leaderboard"
     }
   },
@@ -68,6 +71,19 @@
     "listenToChord": "Listen to the chord",
     "lastResultTitle": "Latest result",
     "lastResult": "You completed the challenge in {time} with {attempts} attempts."
+  },
+  "playDegree": {
+    "label": "Play degree",
+    "modeChord": "Chord",
+    "modeMajor": "Major Scale",
+    "modeModes": "Modes",
+    "start": "Start challenge ({target} correct)",
+    "abort": "Stop",
+    "streak": "Streak",
+    "timer": "Time",
+    "attempts": "Attempts",
+    "lastResultTitle": "Latest result",
+    "lastResult": "You completed the challenge in {time} with {attempts} attempts and {errors} mistakes."
   },
   "results": {
     "title": "Results table",

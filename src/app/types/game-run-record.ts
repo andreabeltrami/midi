@@ -1,6 +1,6 @@
 import { VoicingStyle } from '../enums/voicing-style';
 
-export type TrainerGameType = 'play' | 'recognize';
+export type TrainerGameType = 'play' | 'recognize' | 'degree';
 
 export interface GameRunRecord {
   id: string;
@@ -8,7 +8,7 @@ export interface GameRunRecord {
   elapsedMs: number;
   totalGuesses: number;
   wrongGuesses: number;
-  voicingStyle: VoicingStyle | 'Unknown';
+  voicingStyle: VoicingStyle | 'Unknown' | 'degree' | 'major-scale' | 'modes';
   guessedChords: string[];
   gameType: TrainerGameType;
 }

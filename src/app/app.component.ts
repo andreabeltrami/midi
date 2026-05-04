@@ -1,15 +1,16 @@
 import { Component, inject, signal } from '@angular/core';
 import { PlayChordComponent } from './components/play-chord/play-chord.component';
 import { RecognizeChordComponent } from './components/recognize-chord/recognize-chord.component';
+import { PlayDegreeComponent } from './components/play-degree/play-degree.component';
 import { ResultTableComponent } from './components/result-table/result-table.component';
 import { TranslatePipe } from './pipes/translate.pipe';
 import { I18nService, SupportedLanguage } from './services/i18n.service';
 
-type GameMode = 'play' | 'recognize' | 'leaderboard' | null;
+type GameMode = 'play' | 'recognize' | 'degree' | 'leaderboard' | null;
 
 @Component({
   selector: 'app-root',
-  imports: [PlayChordComponent, RecognizeChordComponent, ResultTableComponent, TranslatePipe],
+  imports: [PlayChordComponent, RecognizeChordComponent, PlayDegreeComponent, ResultTableComponent, TranslatePipe],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
