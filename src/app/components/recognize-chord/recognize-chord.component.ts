@@ -10,9 +10,10 @@ import { KeyboardComponentComponent } from '../keyboard-component/keyboard-compo
 import { KeyboardService } from '../../services/keyboard.service';
 import * as Tone from 'tone';
 import { getChordVoicingIntervals } from '../../config/chord-voicings';
-import { GameRunRecord } from '../../types/game-run-record';
+import { GameRunRecord, GuessAttempt, InputSource } from '../../types/game-run-record';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { VoicingInfoComponent } from '../voicing-info/voicing-info.component';
+import { ResultsStoreService } from '../../services/results-store.service';
 
 @Component({
   selector: 'app-recognize-chord',
@@ -46,6 +47,7 @@ export class RecognizeChordComponent implements OnDestroy {
   totalGuesses = signal(0);
   wrongGuesses = signal(0);
   elapsedSeconds = signal(0);
+  currentGuessElapsedMs = signal(0);
   leaderboard = signal<GameRunRecord[]>([]);
   latestResult = signal<GameRunRecord | null>(null);
 
@@ -55,8 +57,14 @@ export class RecognizeChordComponent implements OnDestroy {
   private gameStartTimestamp = 0;
   private timerIntervalId?: ReturnType<typeof setInterval>;
   private currentRunGuessedChords: string[] = [];
+  private currentRunAttempts: GuessAttempt[] = [];
+  private currentTargetWrongGuesses = 0;
+  private targetStartTimestamp = 0;
 
-  constructor(protected keyboardService: KeyboardService) {
+  constructor(
+    protected keyboardService: KeyboardService,
+    private readonly resultsStore: ResultsStoreService,
+  ) {
     this.drawChord();
     this.initializeToneSampler();
     this.loadLeaderboard();
@@ -100,16 +108,20 @@ export class RecognizeChordComponent implements OnDestroy {
     this.wrongGuesses.set(0);
     this.elapsedSeconds.set(0);
     this.currentRunGuessedChords = [];
+    this.currentRunAttempts = [];
+    this.currentTargetWrongGuesses = 0;
     this.gameActive.set(true);
 
     this.stopTimer();
     this.gameStartTimestamp = Date.now();
     this.timerIntervalId = setInterval(() => {
       this.elapsedSeconds.set(Math.floor((Date.now() - this.gameStartTimestamp) / 1000));
+      this.currentGuessElapsedMs.set(Date.now() - this.targetStartTimestamp);
     }, 250);
 
     this.generateNewChord();
     this.drawChord();
+    this.startTargetTimer();
   }
 
   public abortChallenge() {
@@ -118,7 +130,9 @@ export class RecognizeChordComponent implements OnDestroy {
     this.totalGuesses.set(0);
     this.wrongGuesses.set(0);
     this.elapsedSeconds.set(0);
+    this.currentGuessElapsedMs.set(0);
     this.currentRunGuessedChords = [];
+    this.currentRunAttempts = [];
     this.stopTimer();
   }
 
@@ -164,7 +178,7 @@ export class RecognizeChordComponent implements OnDestroy {
     if (matches) {
       if (this.gameActive()) {
         this.currentStreak.update((value) => value + 1);
-        this.currentRunGuessedChords.push(this.getChordLabel(this.currentChord()));
+        this.recordSuccessfulAttempt(this.getChordLabel(this.currentChord()), 'manual');
       }
 
       this.currentChordCorrect.set(true);
@@ -182,6 +196,7 @@ export class RecognizeChordComponent implements OnDestroy {
         this.currentChordCorrect.set(false);
         this.generateNewChord();
         this.drawChord();
+        this.startTargetTimer();
       }, 500);
       return;
     }
@@ -190,6 +205,7 @@ export class RecognizeChordComponent implements OnDestroy {
     if (this.gameActive()) {
       this.wrongGuesses.update((value) => value + 1);
       this.currentStreak.set(0);
+      this.currentTargetWrongGuesses += 1;
     }
     setTimeout(() => this.currentChordWrong.set(false), 500);
   }
@@ -243,6 +259,8 @@ export class RecognizeChordComponent implements OnDestroy {
       wrongGuesses: this.wrongGuesses(),
       voicingStyle: this.voicingStyle(),
       guessedChords: [...this.currentRunGuessedChords],
+      attempts: [...this.currentRunAttempts],
+      inputSource: 'manual',
       gameType: 'recognize',
     };
 
@@ -259,6 +277,7 @@ export class RecognizeChordComponent implements OnDestroy {
 
     this.leaderboard.set(updatedBoard);
     this.persistLeaderboard(updatedBoard);
+    void this.resultsStore.save(newRecord).catch((error) => console.error(error));
   }
 
   private getChordLabel(chord: ChordDefinition): string {
@@ -309,6 +328,10 @@ export class RecognizeChordComponent implements OnDestroy {
           ...entry,
           voicingStyle: typeof entry.voicingStyle === 'string' ? entry.voicingStyle : 'Unknown',
           gameType: entry.gameType === 'play' ? 'play' : 'recognize',
+          attempts: Array.isArray(entry.attempts) ? entry.attempts : [],
+          inputSource: entry.inputSource === 'midi' || entry.inputSource === 'manual' || entry.inputSource === 'mixed'
+            ? entry.inputSource
+            : 'unknown',
         }));
 
       this.leaderboard.set(
@@ -331,6 +354,24 @@ export class RecognizeChordComponent implements OnDestroy {
 
     clearInterval(this.timerIntervalId);
     this.timerIntervalId = undefined;
+  }
+
+  private startTargetTimer() {
+    this.targetStartTimestamp = Date.now();
+    this.currentGuessElapsedMs.set(0);
+    this.currentTargetWrongGuesses = 0;
+  }
+
+  private recordSuccessfulAttempt(target: string, inputSource: Exclude<InputSource, 'mixed' | 'unknown'>) {
+    const elapsedMs = Date.now() - this.targetStartTimestamp;
+    this.currentRunGuessedChords.push(target);
+    this.currentRunAttempts.push({
+      target,
+      elapsedMs,
+      wrongGuesses: this.currentTargetWrongGuesses,
+      inputSource,
+    });
+    this.currentGuessElapsedMs.set(elapsedMs);
   }
 
   private drawChord() {

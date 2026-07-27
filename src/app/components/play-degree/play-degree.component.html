@@ -43,6 +43,10 @@
           <span>{{ 'playDegree.attempts' | t }}</span>
           <strong>{{ totalGuesses() }}</strong>
         </p>
+        <p class="challenge-item current-target-time">
+          <span>{{ 'playDegree.currentTime' | t }}</span>
+          <strong>{{ getElapsedLabelFromMs(currentGuessElapsedMs()) }}</strong>
+        </p>
       </div>
 
       <div class="challenge-actions">

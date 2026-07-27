@@ -31,9 +31,40 @@
           <span>EN</span>
         </button>
       </div>
+      <label class="midi-selector">
+        <span>{{ 'midi.input' | t }}</span>
+        <select
+          [value]="midi.selectedInputId() ?? ''"
+          (change)="midi.selectInput($event)"
+          [attr.aria-label]="'midi.input' | t">
+          @if (midi.inputs().length === 0) {
+            <option value="">{{ 'midi.noInputs' | t }}</option>
+          } @else {
+            @for (input of midi.inputs(); track input.id) {
+              <option [value]="input.id">{{ input.name || input.id }}</option>
+            }
+          }
+        </select>
+      </label>
     </div>
 
     <div class="topbar-actions">
+      @if (auth.loading()) {
+        <span class="auth-status">...</span>
+      } @else if (auth.user(); as user) {
+        <button class="auth-btn" type="button" (click)="signOut()" [attr.title]="'auth.logout' | t">
+          <span>{{ user.displayName || user.email }}</span>
+          <span>{{ 'auth.logout' | t }}</span>
+        </button>
+      } @else {
+        <button class="auth-btn" type="button" (click)="signInWithGoogle()">
+          <span aria-hidden="true">G</span>
+          <span>{{ 'auth.loginGoogle' | t }}</span>
+        </button>
+      }
+      @if (auth.error()) {
+        <span class="auth-error" role="alert">{{ 'auth.error' | t }}</span>
+      }
       @if (selectedMode() !== null) {
         <div class="mode-actions">
           <button
