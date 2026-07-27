@@ -13,6 +13,7 @@ import { getChordVoicingIntervals } from '../../config/chord-voicings';
 import { GameRunRecord, GuessAttempt, InputSource } from '../../types/game-run-record';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { VoicingInfoComponent } from '../voicing-info/voicing-info.component';
+import { ResultsStoreService } from '../../services/results-store.service';
 
 @Component({
   selector: 'app-recognize-chord',
@@ -60,7 +61,10 @@ export class RecognizeChordComponent implements OnDestroy {
   private currentTargetWrongGuesses = 0;
   private targetStartTimestamp = 0;
 
-  constructor(protected keyboardService: KeyboardService) {
+  constructor(
+    protected keyboardService: KeyboardService,
+    private readonly resultsStore: ResultsStoreService,
+  ) {
     this.drawChord();
     this.initializeToneSampler();
     this.loadLeaderboard();
@@ -273,6 +277,7 @@ export class RecognizeChordComponent implements OnDestroy {
 
     this.leaderboard.set(updatedBoard);
     this.persistLeaderboard(updatedBoard);
+    void this.resultsStore.save(newRecord).catch((error) => console.error(error));
   }
 
   private getChordLabel(chord: ChordDefinition): string {

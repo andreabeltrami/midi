@@ -3,6 +3,7 @@ import { getVoicingLabelKey } from '../../enums/voicing-style';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { I18nService } from '../../services/i18n.service';
 import { GameRunRecord, GuessAttempt, InputSource, TrainerGameType } from '../../types/game-run-record';
+import { ResultsStoreService } from '../../services/results-store.service';
 
 type SortField =
   | 'completedAtIso'
@@ -41,6 +42,7 @@ const STORAGE_KEYS: [TrainerGameType, string][] = [
 })
 export class ResultTableComponent {
   private readonly i18n = inject(I18nService);
+  private readonly resultsStore = inject(ResultsStoreService);
 
   readonly records = signal<GameRunRecord[]>(this.loadFromStorage());
   readonly searchTerm = signal('');
@@ -66,6 +68,10 @@ export class ResultTableComponent {
   });
 
   readonly inputSourceOptions: (InputSource | 'all')[] = ['all', 'midi', 'manual', 'mixed', 'unknown'];
+
+  constructor() {
+    void this.mergeRemoteRecords();
+  }
 
   readonly filteredRecords = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
@@ -210,6 +216,31 @@ export class ResultTableComponent {
         .sort((a, b) => (a.elapsedMs !== b.elapsedMs ? a.elapsedMs - b.elapsedMs : a.totalGuesses - b.totalGuesses));
     } catch {
       return [];
+    }
+  }
+
+  private async mergeRemoteRecords(): Promise<void> {
+    try {
+      const remoteRecords = (await this.resultsStore.load()).map((record) => {
+        const inputSource: InputSource =
+          record.inputSource === 'midi' || record.inputSource === 'manual' || record.inputSource === 'mixed'
+            ? record.inputSource
+            : 'unknown';
+
+        return {
+          ...record,
+          guessedChords: Array.isArray(record.guessedChords) ? record.guessedChords : [],
+          attempts: this.normalizeAttempts(record.attempts, inputSource),
+          inputSource,
+        };
+      });
+      const recordsById = new Map(this.records().map((record) => [record.id, record]));
+      for (const record of remoteRecords) {
+        recordsById.set(record.id, record);
+      }
+      this.records.set(Array.from(recordsById.values()).sort((a, b) => b.completedAtIso.localeCompare(a.completedAtIso)));
+    } catch (error) {
+      console.error(error);
     }
   }
 

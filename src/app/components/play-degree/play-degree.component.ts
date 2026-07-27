@@ -17,6 +17,7 @@ import { GameRunRecord, GuessAttempt, InputSource } from '../../types/game-run-r
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { MidiService } from '../../services/midi.service';
 import { Subscription } from 'rxjs';
+import { ResultsStoreService } from '../../services/results-store.service';
 
 @Component({
   selector: 'app-play-degree',
@@ -99,7 +100,11 @@ export class PlayDegreeComponent implements OnDestroy {
   private targetStartTimestamp = 0;
   private midiSubscription?: Subscription;
 
-  constructor(protected keyboardService: KeyboardService, midiService: MidiService) {
+  constructor(
+    protected keyboardService: KeyboardService,
+    midiService: MidiService,
+    private readonly resultsStore: ResultsStoreService,
+  ) {
     keyboardService.onPianoManuallyKeyPressed$.subscribe((pianoKey) => {
       this.onPianoKeyManuallyPressed(pianoKey);
     });
@@ -334,6 +339,7 @@ export class PlayDegreeComponent implements OnDestroy {
 
     setBoard(updatedBoard);
     this.persistLeaderboard(updatedBoard, this.playMode());
+    void this.resultsStore.save(newRecord).catch((error) => console.error(error));
   }
 
   private getChordDegreeLabel(chord: ChordDefinition, degree: ChordDegree): string {

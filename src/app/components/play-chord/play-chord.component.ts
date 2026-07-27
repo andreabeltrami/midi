@@ -16,6 +16,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 import { VoicingInfoComponent } from '../voicing-info/voicing-info.component';
 import { MidiService } from '../../services/midi.service';
 import { Subscription } from 'rxjs';
+import { ResultsStoreService } from '../../services/results-store.service';
 
 @Component({
   selector: 'app-play-chord',
@@ -69,7 +70,11 @@ export class PlayChordComponent implements OnDestroy {
   private targetStartTimestamp = 0;
   private midiSubscription?: Subscription;
 
-  constructor(protected keyboardService: KeyboardService, midiService: MidiService) {
+  constructor(
+    protected keyboardService: KeyboardService,
+    midiService: MidiService,
+    private readonly resultsStore: ResultsStoreService,
+  ) {
     keyboardService.onPianoManuallyKeyPressed$.subscribe((pianoKey) => {
       this.onPianoKeyManuallyPressed(pianoKey);
     });
@@ -293,6 +298,7 @@ export class PlayChordComponent implements OnDestroy {
 
     this.leaderboard.set(updatedBoard);
     this.persistLeaderboard(updatedBoard);
+    void this.resultsStore.save(newRecord).catch((error) => console.error(error));
   }
 
   private getChordLabel(chord: ChordDefinition): string {
