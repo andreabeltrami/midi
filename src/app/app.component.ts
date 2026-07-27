@@ -5,6 +5,7 @@ import { PlayDegreeComponent } from './components/play-degree/play-degree.compon
 import { ResultTableComponent } from './components/result-table/result-table.component';
 import { TranslatePipe } from './pipes/translate.pipe';
 import { I18nService, SupportedLanguage } from './services/i18n.service';
+import { MidiService } from './services/midi.service';
 
 type GameMode = 'play' | 'recognize' | 'degree' | 'leaderboard' | null;
 
@@ -16,6 +17,7 @@ type GameMode = 'play' | 'recognize' | 'degree' | 'leaderboard' | null;
 })
 export class AppComponent {
   readonly i18n = inject(I18nService);
+  readonly midi = inject(MidiService);
   selectedMode = signal<GameMode>(null);
 
   selectMode(mode: Exclude<GameMode, null>) {

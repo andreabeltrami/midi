@@ -14,6 +14,8 @@ import { getChordVoicingIntervals } from '../../config/chord-voicings';
 import { GameRunRecord } from '../../types/game-run-record';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { VoicingInfoComponent } from '../voicing-info/voicing-info.component';
+import { MidiService } from '../../services/midi.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-play-chord',
@@ -61,19 +63,21 @@ export class PlayChordComponent implements OnDestroy {
   private gameStartTimestamp = 0;
   private timerIntervalId?: ReturnType<typeof setInterval>;
   private currentRunGuessedChords: string[] = [];
+  private midiSubscription?: Subscription;
 
-  constructor(protected keyboardService: KeyboardService) {
+  constructor(protected keyboardService: KeyboardService, midiService: MidiService) {
     keyboardService.onPianoManuallyKeyPressed$.subscribe((pianoKey) => {
       this.onPianoKeyManuallyPressed(pianoKey);
     });
 
-    this.InitializeMidiConnection();
+    this.midiSubscription = midiService.midiMessage$.subscribe(this.onMIDIMessage);
     this.InitializeToneSampler();
     this.loadLeaderboard();
   }
 
   ngOnDestroy() {
     this.stopTimer();
+    this.midiSubscription?.unsubscribe();
   }
 
   public get targetStreak() {
@@ -165,16 +169,6 @@ export class PlayChordComponent implements OnDestroy {
     }
   }
 
-  private InitializeMidiConnection() {
-    try {
-      navigator.requestMIDIAccess().then(this.onMidiAccess, (x) => {
-        console.error(x);
-      });
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
   private onPianoKeyManuallyPressed(pianoKey: PianoKey) {
     if (pianoKey.isPressed()) {
       this.handleNote(MidiEventType.Released, pianoKey.note.originalNumber, 127);
@@ -182,13 +176,6 @@ export class PlayChordComponent implements OnDestroy {
       this.handleNote(MidiEventType.Pressed, pianoKey.note.originalNumber, 127);
     }
   }
-
-  private onMidiAccess = (midiAccess: MIDIAccess) => {
-    const midiInput = midiAccess.inputs.get('input-0');
-    if (midiInput) {
-      midiInput.onmidimessage = this.onMIDIMessage;
-    }
-  };
 
   private onMIDIMessage = (event: MIDIMessageEvent): void => {
     if (!event.data) {
@@ -447,4 +434,3 @@ export class PlayChordComponent implements OnDestroy {
     return values[randomIndex];
   };
 }
-

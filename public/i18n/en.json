@@ -4,6 +4,10 @@
     "it": "Italian",
     "en": "English"
   },
+  "midi": {
+    "input": "MIDI input",
+    "noInputs": "No MIDI input"
+  },
   "common": {
     "all": "All",
     "game": "Game",
