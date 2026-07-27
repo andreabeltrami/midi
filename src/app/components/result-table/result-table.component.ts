@@ -2,7 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { getVoicingLabelKey } from '../../enums/voicing-style';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { I18nService } from '../../services/i18n.service';
-import { GameRunRecord, TrainerGameType } from '../../types/game-run-record';
+import { GameRunRecord, GuessAttempt, InputSource, TrainerGameType } from '../../types/game-run-record';
 
 type SortField =
   | 'completedAtIso'
@@ -13,12 +13,25 @@ type SortField =
   | 'gameType';
 type SortDirection = 'asc' | 'desc';
 type ResultsTab = 'all' | TrainerGameType;
+type DifficultySortField = 'averageTime' | 'wrongGuesses' | 'attempts';
 
-const STORAGE_KEYS: Record<TrainerGameType, string> = {
-  play: 'play-chord-leaderboard-v1',
-  recognize: 'recognize-chord-leaderboard-v1',
-  degree: 'play-degree-leaderboard-v1',
-};
+interface DifficultyStat {
+  key: string;
+  target: string;
+  gameType: TrainerGameType;
+  inputSource: InputSource;
+  attempts: number;
+  averageTimeMs: number;
+  wrongGuesses: number;
+}
+
+const STORAGE_KEYS: [TrainerGameType, string][] = [
+  ['play', 'play-chord-leaderboard-v1'],
+  ['recognize', 'recognize-chord-leaderboard-v1'],
+  ['degree', 'play-degree-chord-leaderboard-v1'],
+  ['degree', 'play-degree-major-leaderboard-v1'],
+  ['degree', 'play-degree-modes-leaderboard-v1'],
+];
 
 @Component({
   selector: 'app-result-table',
@@ -32,15 +45,19 @@ export class ResultTableComponent {
   readonly records = signal<GameRunRecord[]>(this.loadFromStorage());
   readonly searchTerm = signal('');
   readonly selectedVoicing = signal<string>('all');
+  readonly selectedInputSource = signal<InputSource | 'all'>('all');
   readonly selectedTab = signal<ResultsTab>('all');
   readonly sortField = signal<SortField>('elapsedMs');
   readonly sortDirection = signal<SortDirection>('asc');
+  readonly difficultySortField = signal<DifficultySortField>('averageTime');
+  readonly difficultySortDirection = signal<SortDirection>('desc');
   readonly getVoicingLabelKey = getVoicingLabelKey;
 
   readonly tabs: { labelKey: string; value: ResultsTab }[] = [
     { labelKey: 'common.all', value: 'all' },
     { labelKey: 'app.modes.playTitle', value: 'play' },
     { labelKey: 'app.modes.recognizeTitle', value: 'recognize' },
+    { labelKey: 'app.modes.degreeTitle', value: 'degree' },
   ];
 
   readonly voicingOptions = computed(() => {
@@ -48,13 +65,17 @@ export class ResultTableComponent {
     return ['all', ...Array.from(options)];
   });
 
+  readonly inputSourceOptions: (InputSource | 'all')[] = ['all', 'midi', 'manual', 'mixed', 'unknown'];
+
   readonly filteredRecords = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
     const voicing = this.selectedVoicing();
+    const inputSource = this.selectedInputSource();
     const tab = this.selectedTab();
 
     const filtered = this.records().filter((record) => {
       const matchVoicing = voicing === 'all' || record.voicingStyle === voicing;
+      const matchInputSource = inputSource === 'all' || record.inputSource === inputSource;
       const matchTab = tab === 'all' || record.gameType === tab;
       const matchTerm =
         term.length === 0 ||
@@ -62,7 +83,7 @@ export class ResultTableComponent {
         this.getReadableDate(record.completedAtIso).toLowerCase().includes(term) ||
         this.getGameLabel(record.gameType).toLowerCase().includes(term);
 
-      return matchVoicing && matchTab && matchTerm;
+      return matchVoicing && matchInputSource && matchTab && matchTerm;
     });
 
     const field = this.sortField();
@@ -82,12 +103,50 @@ export class ResultTableComponent {
     });
   });
 
+  readonly difficultyStats = computed(() => {
+      const aggregate = new Map<string, DifficultyStat>();
+
+      for (const record of this.filteredRecords()) {
+        for (const attempt of record.attempts) {
+          const key = `${record.gameType}:${attempt.inputSource}:${attempt.target}`;
+          const current = aggregate.get(key) ?? {
+            key,
+            target: attempt.target,
+            gameType: record.gameType,
+            inputSource: attempt.inputSource,
+            attempts: 0,
+            averageTimeMs: 0,
+            wrongGuesses: 0,
+          };
+          current.averageTimeMs += attempt.elapsedMs;
+          current.attempts += 1;
+          current.wrongGuesses += attempt.wrongGuesses;
+          aggregate.set(key, current);
+        }
+      }
+
+      const field = this.difficultySortField();
+      const direction = this.difficultySortDirection() === 'asc' ? 1 : -1;
+
+      return Array.from(aggregate.values())
+        .map((stat) => ({ ...stat, averageTimeMs: stat.averageTimeMs / stat.attempts }))
+        .sort((first, second) => {
+          const left = field === 'averageTime' ? first.averageTimeMs : field === 'wrongGuesses' ? first.wrongGuesses : first.attempts;
+          const right = field === 'averageTime' ? second.averageTimeMs : field === 'wrongGuesses' ? second.wrongGuesses : second.attempts;
+          return (left - right) * direction;
+        });
+    });
+
   setSearchTerm(event: Event) {
     this.searchTerm.set((event.target as HTMLInputElement).value);
   }
 
   setVoicingFilter(event: Event) {
     this.selectedVoicing.set((event.target as HTMLSelectElement).value);
+  }
+
+  setInputSourceFilter(event: Event) {
+    this.selectedInputSource.set((event.target as HTMLSelectElement).value as InputSource | 'all');
   }
 
   setSortField(event: Event) {
@@ -100,6 +159,14 @@ export class ResultTableComponent {
 
   toggleSortDirection() {
     this.sortDirection.update((current) => (current === 'asc' ? 'desc' : 'asc'));
+  }
+
+  setDifficultySortField(event: Event) {
+    this.difficultySortField.set((event.target as HTMLSelectElement).value as DifficultySortField);
+  }
+
+  toggleDifficultySortDirection() {
+    this.difficultySortDirection.update((current) => (current === 'asc' ? 'desc' : 'asc'));
   }
 
   getElapsedLabelFromMs(milliseconds: number): string {
@@ -118,13 +185,28 @@ export class ResultTableComponent {
   }
 
   getGameLabel(gameType: TrainerGameType): string {
-    return this.i18n.t(gameType === 'play' ? 'app.modes.playTitle' : 'app.modes.recognizeTitle');
+    const keyByGameType: Record<TrainerGameType, string> = {
+      play: 'app.modes.playTitle',
+      recognize: 'app.modes.recognizeTitle',
+      degree: 'app.modes.degreeTitle',
+    };
+    return this.i18n.t(keyByGameType[gameType]);
+  }
+
+  getInputSourceLabel(source: InputSource | 'all'): string {
+    const keyBySource: Record<InputSource | 'all', string> = {
+      all: 'common.all',
+      midi: 'results.inputSources.midi',
+      manual: 'results.inputSources.manual',
+      mixed: 'results.inputSources.mixed',
+      unknown: 'results.inputSources.unknown',
+    };
+    return this.i18n.t(keyBySource[source]);
   }
 
   private loadFromStorage(): GameRunRecord[] {
     try {
-      return (Object.entries(STORAGE_KEYS) as [TrainerGameType, string][])
-        .flatMap(([gameType, storageKey]) => this.loadBoard(storageKey, gameType))
+      return STORAGE_KEYS.flatMap(([gameType, storageKey]) => this.loadBoard(storageKey, gameType))
         .sort((a, b) => (a.elapsedMs !== b.elapsedMs ? a.elapsedMs - b.elapsedMs : a.totalGuesses - b.totalGuesses));
     } catch {
       return [];
@@ -160,8 +242,32 @@ export class ResultTableComponent {
         wrongGuesses: entry.wrongGuesses as number,
         voicingStyle: typeof entry.voicingStyle === 'string' ? entry.voicingStyle : 'Unknown',
         guessedChords: [...(entry.guessedChords as string[])],
+        attempts: this.normalizeAttempts(entry.attempts, typeof entry.inputSource === 'string' ? entry.inputSource as InputSource : 'unknown'),
+        inputSource: entry.inputSource === 'midi' || entry.inputSource === 'manual' || entry.inputSource === 'mixed'
+          ? entry.inputSource
+          : 'unknown',
         gameType: entry.gameType === 'play' || entry.gameType === 'recognize' ? entry.gameType : gameType,
       }));
+  }
+
+  private normalizeAttempts(value: unknown, fallbackSource: InputSource): GuessAttempt[] {
+    if (!Array.isArray(value)) {
+      return [];
+    }
+
+    return value.filter(
+      (attempt): attempt is GuessAttempt =>
+        !!attempt &&
+        typeof attempt === 'object' &&
+        typeof (attempt as GuessAttempt).target === 'string' &&
+        typeof (attempt as GuessAttempt).elapsedMs === 'number' &&
+        typeof (attempt as GuessAttempt).wrongGuesses === 'number',
+    ).map((attempt) => ({
+      ...attempt,
+      inputSource: attempt.inputSource === 'midi' || attempt.inputSource === 'manual' || attempt.inputSource === 'mixed' || attempt.inputSource === 'unknown'
+        ? attempt.inputSource
+        : fallbackSource,
+    }));
   }
 
   private getSortValue(record: GameRunRecord, field: SortField): number | string {

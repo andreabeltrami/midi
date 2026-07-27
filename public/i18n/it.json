@@ -14,6 +14,7 @@
     "date": "Data",
     "time": "Tempo",
     "attempts": "Tentativi",
+    "currentTime": "Tempo attuale",
     "errors": "Errori",
     "voicing": "Voicing",
     "chords": "Accordi",
@@ -59,6 +60,7 @@
     "streak": "Streak",
     "timer": "Tempo",
     "attempts": "Tentativi",
+    "currentTime": "Tempo attuale",
     "voicingStyle": "Stile voicing",
     "lastResultTitle": "Ultimo risultato",
     "lastResult": "Hai completato la sfida in {time} con {attempts} tentativi e {errors} errori."
@@ -70,6 +72,7 @@
     "streak": "Streak",
     "timer": "Tempo",
     "attempts": "Tentativi",
+    "currentTime": "Tempo attuale",
     "changeChord": "Cambia accordo",
     "voicingStyle": "Stile voicing",
     "listenToChord": "Ascolta l'accordo",
@@ -91,7 +94,18 @@
   },
   "results": {
     "title": "Tabella risultati",
-    "description": "Storico completo di Play Chord e Recognize Chord, salvato in locale.",
+    "description": "Storico locale completo di tutte le modalità.",
+    "difficultyTitle": "Statistiche difficoltà",
+    "difficultyDescription": "Tempo medio ed errori mostrano le parti più difficili.",
+    "difficultySort": "Ordina difficoltà per",
+    "difficultyEmpty": "Completa una sfida per creare le statistiche.",
+    "filterInput": "Input",
+    "inputSources": {
+      "midi": "MIDI",
+      "manual": "Manuale",
+      "mixed": "Misto",
+      "unknown": "Sconosciuto"
+    },
     "gameFilter": "Filtro gioco",
     "filterVoicing": "Filtra voicing",
     "searchPlaceholder": "Accordo, gioco o data",
@@ -104,7 +118,11 @@
       "attempts": "Tentativi",
       "errors": "Errori",
       "voicing": "Voicing",
-      "chords": "Accordi"
+      "chords": "Accordi",
+      "part": "Parte",
+      "solved": "Risolti",
+      "averageTime": "Tempo medio",
+      "input": "Input"
     },
     "sortOptions": {
       "time": "Tempo",
@@ -112,7 +130,8 @@
       "game": "Gioco",
       "attempts": "Tentativi",
       "errors": "Errori",
-      "voicing": "Voicing"
+      "voicing": "Voicing",
+      "averageTime": "Tempo medio"
     }
   },
   "voicing": {

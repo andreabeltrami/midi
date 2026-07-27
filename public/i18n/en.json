@@ -14,6 +14,7 @@
     "date": "Date",
     "time": "Time",
     "attempts": "Attempts",
+    "currentTime": "Current time",
     "errors": "Errors",
     "voicing": "Voicing",
     "chords": "Chords",
@@ -59,6 +60,7 @@
     "streak": "Streak",
     "timer": "Time",
     "attempts": "Attempts",
+    "currentTime": "Current time",
     "voicingStyle": "Voicing style",
     "lastResultTitle": "Latest result",
     "lastResult": "You completed the challenge in {time} with {attempts} attempts and {errors} mistakes."
@@ -70,6 +72,7 @@
     "streak": "Streak",
     "timer": "Time",
     "attempts": "Attempts",
+    "currentTime": "Current time",
     "changeChord": "Change chord",
     "voicingStyle": "Voicing style",
     "listenToChord": "Listen to the chord",
@@ -91,7 +94,18 @@
   },
   "results": {
     "title": "Results table",
-    "description": "Complete local history of Play Chord and Recognize Chord.",
+    "description": "Complete local history of all trainer modes.",
+    "difficultyTitle": "Difficulty statistics",
+    "difficultyDescription": "Parts with higher average time or more errors are harder for you.",
+    "difficultySort": "Order difficulty by",
+    "difficultyEmpty": "Complete a challenge to build difficulty statistics.",
+    "filterInput": "Input",
+    "inputSources": {
+      "midi": "MIDI",
+      "manual": "Manual",
+      "mixed": "Mixed",
+      "unknown": "Unknown"
+    },
     "gameFilter": "Game filter",
     "filterVoicing": "Filter voicing",
     "searchPlaceholder": "Chord, game or date",
@@ -104,7 +118,11 @@
       "attempts": "Attempts",
       "errors": "Errors",
       "voicing": "Voicing",
-      "chords": "Chords"
+      "chords": "Chords",
+      "part": "Part",
+      "solved": "Solved",
+      "averageTime": "Average time",
+      "input": "Input"
     },
     "sortOptions": {
       "time": "Time",
@@ -112,7 +130,8 @@
       "game": "Game",
       "attempts": "Attempts",
       "errors": "Errors",
-      "voicing": "Voicing"
+      "voicing": "Voicing",
+      "averageTime": "Average time"
     }
   },
   "voicing": {
