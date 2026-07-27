@@ -8,6 +8,11 @@
     "input": "Ingresso MIDI",
     "noInputs": "Nessun ingresso MIDI"
   },
+  "auth": {
+    "loginGoogle": "Accedi con Google",
+    "logout": "Esci",
+    "error": "Login Google non disponibile. Verifica la configurazione Firebase Auth."
+  },
   "common": {
     "all": "Tutti",
     "game": "Gioco",

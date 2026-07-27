@@ -1,9 +1,11 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
+import type { User } from 'firebase/auth';
 import { getVoicingLabelKey } from '../../enums/voicing-style';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { I18nService } from '../../services/i18n.service';
 import { GameRunRecord, GuessAttempt, InputSource, TrainerGameType } from '../../types/game-run-record';
 import { ResultsStoreService } from '../../services/results-store.service';
+import { AuthService } from '../../services/auth.service';
 
 type SortField =
   | 'completedAtIso'
@@ -43,6 +45,7 @@ const STORAGE_KEYS: [TrainerGameType, string][] = [
 export class ResultTableComponent {
   private readonly i18n = inject(I18nService);
   private readonly resultsStore = inject(ResultsStoreService);
+  private readonly auth = inject(AuthService);
 
   readonly records = signal<GameRunRecord[]>(this.loadFromStorage());
   readonly searchTerm = signal('');
@@ -70,7 +73,9 @@ export class ResultTableComponent {
   readonly inputSourceOptions: (InputSource | 'all')[] = ['all', 'midi', 'manual', 'mixed', 'unknown'];
 
   constructor() {
-    void this.mergeRemoteRecords();
+    effect(() => {
+      void this.loadRecordsForUser(this.auth.user());
+    });
   }
 
   readonly filteredRecords = computed(() => {
@@ -219,7 +224,12 @@ export class ResultTableComponent {
     }
   }
 
-  private async mergeRemoteRecords(): Promise<void> {
+  private async loadRecordsForUser(user: User | null): Promise<void> {
+    if (!user) {
+      this.records.set(this.loadFromStorage());
+      return;
+    }
+
     try {
       const remoteRecords = (await this.resultsStore.load()).map((record) => {
         const inputSource: InputSource =
@@ -234,11 +244,7 @@ export class ResultTableComponent {
           inputSource,
         };
       });
-      const recordsById = new Map(this.records().map((record) => [record.id, record]));
-      for (const record of remoteRecords) {
-        recordsById.set(record.id, record);
-      }
-      this.records.set(Array.from(recordsById.values()).sort((a, b) => b.completedAtIso.localeCompare(a.completedAtIso)));
+      this.records.set(remoteRecords.sort((a, b) => b.completedAtIso.localeCompare(a.completedAtIso)));
     } catch (error) {
       console.error(error);
     }

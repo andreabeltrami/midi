@@ -8,6 +8,11 @@
     "input": "MIDI input",
     "noInputs": "No MIDI input"
   },
+  "auth": {
+    "loginGoogle": "Sign in with Google",
+    "logout": "Sign out",
+    "error": "Google login unavailable. Check Firebase Auth configuration."
+  },
   "common": {
     "all": "All",
     "game": "Game",

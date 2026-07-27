@@ -49,6 +49,22 @@
     </div>
 
     <div class="topbar-actions">
+      @if (auth.loading()) {
+        <span class="auth-status">...</span>
+      } @else if (auth.user(); as user) {
+        <button class="auth-btn" type="button" (click)="signOut()" [attr.title]="'auth.logout' | t">
+          <span>{{ user.displayName || user.email }}</span>
+          <span>{{ 'auth.logout' | t }}</span>
+        </button>
+      } @else {
+        <button class="auth-btn" type="button" (click)="signInWithGoogle()">
+          <span aria-hidden="true">G</span>
+          <span>{{ 'auth.loginGoogle' | t }}</span>
+        </button>
+      }
+      @if (auth.error()) {
+        <span class="auth-error" role="alert">{{ 'auth.error' | t }}</span>
+      }
       @if (selectedMode() !== null) {
         <div class="mode-actions">
           <button
