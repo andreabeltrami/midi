@@ -18,6 +18,8 @@ import { MidiService } from '../../services/midi.service';
 import { Subscription } from 'rxjs';
 import { ResultsStoreService } from '../../services/results-store.service';
 
+type StartingDegree = 'root' | 'ninth' | 'seventhSixth' | 'third' | 'fifthSixth';
+
 @Component({
   selector: 'app-play-chord',
   imports: [KeyboardComponentComponent, TranslatePipe, VoicingInfoComponent],
@@ -36,6 +38,24 @@ export class PlayChordComponent implements OnDestroy {
   currentChordCorrect = signal(false);
   voicingStyle = signal<VoicingStyle>(VoicingStyle.Standard);
   showVoicingInfo = signal(false);
+  startingDegreeRuleEnabled = signal(false);
+  startingDegreeMenuOpen = signal(false);
+  selectedStartingDegrees = signal<StartingDegree[]>([
+    'root',
+    'ninth',
+    'seventhSixth',
+    'third',
+    'fifthSixth',
+  ]);
+  currentStartingDegree = signal<StartingDegree | null>(null);
+
+  readonly startingDegreeOptions: { key: StartingDegree; labelKey: string }[] = [
+    { key: 'root', labelKey: 'play.startingDegrees.root' },
+    { key: 'ninth', labelKey: 'play.startingDegrees.ninth' },
+    { key: 'seventhSixth', labelKey: 'play.startingDegrees.seventhSixth' },
+    { key: 'third', labelKey: 'play.startingDegrees.third' },
+    { key: 'fifthSixth', labelKey: 'play.startingDegrees.fifthSixth' },
+  ];
 
   gameActive = signal(false);
   currentStreak = signal(0);
@@ -150,6 +170,37 @@ export class PlayChordComponent implements OnDestroy {
     this.voicingStyle.set(value);
     this.clearFeedback();
     this.resetPressedNotes();
+    this.selectStartingDegreeTarget();
+  }
+
+  public toggleStartingDegreeRule(event: Event) {
+    this.startingDegreeRuleEnabled.set((event.target as HTMLInputElement).checked);
+    this.selectStartingDegreeTarget();
+  }
+
+  public toggleStartingDegreeMenu() {
+    this.startingDegreeMenuOpen.update((open) => !open);
+  }
+
+  public toggleStartingDegree(key: StartingDegree, event: Event) {
+    const checked = (event.target as HTMLInputElement).checked;
+    this.selectedStartingDegrees.update((selected) =>
+      checked ? (selected.includes(key) ? selected : [...selected, key]) : selected.filter((item) => item !== key),
+    );
+    this.selectStartingDegreeTarget();
+  }
+
+  public isStartingDegreeAvailable(key: StartingDegree): boolean {
+    const intervals = this.getIntervalsArray(this.currentChord().type);
+    const indexByDegree: Record<StartingDegree, number> = {
+      root: 0,
+      ninth: 0,
+      third: 1,
+      fifthSixth: 2,
+      seventhSixth: 3,
+    };
+    const interval = intervals[indexByDegree[key]];
+    return key === 'root' ? interval === Interval.I : key === 'ninth' ? interval === Interval.II : interval !== undefined;
   }
 
   public toggleVoicingInfo() {
@@ -380,6 +431,17 @@ export class PlayChordComponent implements OnDestroy {
     this.currentTargetWrongGuesses = 0;
   }
 
+  private selectStartingDegreeTarget() {
+    if (!this.startingDegreeRuleEnabled()) {
+      this.currentStartingDegree.set(null);
+      return;
+    }
+
+    const available = this.selectedStartingDegrees().filter((degree) => this.isStartingDegreeAvailable(degree));
+    const target = available[Math.floor(Math.random() * available.length)] ?? null;
+    this.currentStartingDegree.set(target);
+  }
+
   private recordSuccessfulAttempt(target: string, inputSource: Exclude<InputSource, 'mixed' | 'unknown'>) {
     const elapsedMs = Date.now() - this.targetStartTimestamp;
     this.currentRunGuessedChords.push(target);
@@ -407,6 +469,7 @@ export class PlayChordComponent implements OnDestroy {
     }
 
     this.currentChord.set(newChord);
+    this.selectStartingDegreeTarget();
   }
 
   private playSound(status: number, noteId: number, velocity: number) {
@@ -455,11 +518,39 @@ export class PlayChordComponent implements OnDestroy {
       return false;
     }
 
+    if (this.startingDegreeRuleEnabled() && this.currentStartingDegree()) {
+      const startIndex = this.getStartingDegreeIndex(this.currentStartingDegree()!);
+      const orderedExpectedIntervals = [
+        ...expectedIntervals.slice(startIndex),
+        ...expectedIntervals.slice(0, startIndex),
+      ];
+      return this.serializeIntervals(playedIntervals, false) === this.serializeIntervals(orderedExpectedIntervals, false);
+    }
+
     return this.serializeIntervals(playedIntervals) === this.serializeIntervals(expectedIntervals);
   }
 
-  private serializeIntervals(intervals: readonly Interval[]): string {
-    return [...intervals].sort((a, b) => a - b).join(',');
+  private getIntervalsArray(chordType: ChordType): Interval[] {
+    const intervals = getChordVoicingIntervals(chordType, this.voicingStyle());
+    return intervals ? [...intervals] : [];
+  }
+
+  private getStartingDegreeIndex(degree: StartingDegree): number {
+    return {
+      root: 0,
+      ninth: 0,
+      third: 1,
+      fifthSixth: 2,
+      seventhSixth: 3,
+    }[degree];
+  }
+
+  private serializeIntervals(intervals: readonly Interval[], sort = true): string {
+    const values = [...intervals];
+    if (sort) {
+      values.sort((a, b) => a - b);
+    }
+    return values.join(',');
   }
 
   static generateRandomChord(): ChordDefinition {

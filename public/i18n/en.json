@@ -44,6 +44,7 @@
     "description": "Choose how to train",
     "modeSelector": "Mode selector",
     "mainMenu": "Main menu",
+    "toggleMenu": "Toggle menu",
     "home": "Back to home",
     "modes": {
       "playTitle": "Play chord",
@@ -67,6 +68,16 @@
     "attempts": "Attempts",
     "currentTime": "Current time",
     "voicingStyle": "Voicing style",
+    "startingDegreeRule": "Enable starting degree rule",
+    "startingDegreeMenu": "Choose starting degrees",
+    "startingDegreeTarget": "Start with",
+    "startingDegrees": {
+      "root": "Root",
+      "ninth": "9th",
+      "seventhSixth": "7th/6th",
+      "third": "3rd",
+      "fifthSixth": "5th/6th"
+    },
     "lastResultTitle": "Latest result",
     "lastResult": "You completed the challenge in {time} with {attempts} attempts and {errors} mistakes."
   },

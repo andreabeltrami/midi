@@ -44,6 +44,7 @@
     "description": "Scegli come allenarti",
     "modeSelector": "Selettore modalità",
     "mainMenu": "Menu principale",
+    "toggleMenu": "Apri o chiudi menu",
     "home": "Torna all'inizio",
     "modes": {
       "playTitle": "Suona l'accordo",
@@ -67,6 +68,16 @@
     "attempts": "Tentativi",
     "currentTime": "Tempo attuale",
     "voicingStyle": "Stile voicing",
+    "startingDegreeRule": "Attiva regola grado iniziale",
+    "startingDegreeMenu": "Scegli gradi iniziali",
+    "startingDegreeTarget": "Inizia da",
+    "startingDegrees": {
+      "root": "Fondamentale",
+      "ninth": "9ª",
+      "seventhSixth": "7ª/6ª",
+      "third": "3ª",
+      "fifthSixth": "5ª/6ª"
+    },
     "lastResultTitle": "Ultimo risultato",
     "lastResult": "Hai completato la sfida in {time} con {attempts} tentativi e {errors} errori."
   },

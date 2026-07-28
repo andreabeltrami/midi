@@ -1,5 +1,9 @@
 <div class="app-shell">
-  <header class="topbar" role="navigation" [attr.aria-label]="'app.mainMenu' | t">
+  <header
+    class="topbar"
+    [class.mobile-menu-open]="mobileMenuOpen()"
+    role="navigation"
+    [attr.aria-label]="'app.mainMenu' | t">
     <div class="topbar-brand">
       <span class="brand-badge icon-glyph" aria-hidden="true">♫</span>
       <div class="brand-copy">
@@ -8,7 +12,7 @@
       </div>
     </div>
 
-    <div class="topbar-center">
+    <div class="topbar-language">
       <div class="language-pill" role="group" [attr.aria-label]="'language.label' | t">
         <button
           type="button"
@@ -31,6 +35,18 @@
           <span>EN</span>
         </button>
       </div>
+    </div>
+
+    <button
+      type="button"
+      class="hamburger-btn"
+      (click)="toggleMobileMenu()"
+      [attr.aria-expanded]="mobileMenuOpen()"
+      [attr.aria-label]="'app.toggleMenu' | t">
+      <span aria-hidden="true">☰</span>
+    </button>
+
+    <div class="topbar-center">
       <label class="midi-selector">
         <span>{{ 'midi.input' | t }}</span>
         <select
@@ -74,6 +90,7 @@
             [attr.aria-label]="'app.modes.playTitle' | t"
             [attr.title]="'app.modes.playTitle' | t">
             <span class="icon-glyph" aria-hidden="true">🎹</span>
+            <span class="menu-label">{{ 'app.modes.playTitle' | t }}</span>
           </button>
           <button
             class="menu-link icon-link"
@@ -82,6 +99,7 @@
             [attr.aria-label]="'app.modes.recognizeTitle' | t"
             [attr.title]="'app.modes.recognizeTitle' | t">
             <span class="icon-glyph" aria-hidden="true">🎧</span>
+            <span class="menu-label">{{ 'app.modes.recognizeTitle' | t }}</span>
           </button>
           <button
             class="menu-link icon-link"
@@ -90,6 +108,7 @@
             [attr.aria-label]="'app.modes.degreeTitle' | t"
             [attr.title]="'app.modes.degreeTitle' | t">
             <span class="icon-glyph" aria-hidden="true">📍</span>
+            <span class="menu-label">{{ 'app.modes.degreeTitle' | t }}</span>
           </button>
           <button
             class="menu-link icon-link"
@@ -98,6 +117,7 @@
             [attr.aria-label]="'app.modes.leaderboardTitle' | t"
             [attr.title]="'app.modes.leaderboardTitle' | t">
             <span class="icon-glyph" aria-hidden="true">🏆</span>
+            <span class="menu-label">{{ 'app.modes.leaderboardTitle' | t }}</span>
           </button>
           <button
             class="menu-link icon-link ghost"
@@ -105,6 +125,7 @@
             [attr.aria-label]="'app.home' | t"
             [attr.title]="'app.home' | t">
             <span class="icon-glyph" aria-hidden="true">🏠</span>
+            <span class="menu-label">{{ 'app.home' | t }}</span>
           </button>
         </div>
       }
