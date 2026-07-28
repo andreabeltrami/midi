@@ -21,13 +21,16 @@ export class AppComponent {
   readonly midi = inject(MidiService);
   readonly auth = inject(AuthService);
   selectedMode = signal<GameMode>(null);
+  mobileMenuOpen = signal(false);
 
   selectMode(mode: Exclude<GameMode, null>) {
     this.selectedMode.set(mode);
+    this.mobileMenuOpen.set(false);
   }
 
   resetModeSelection() {
     this.selectedMode.set(null);
+    this.mobileMenuOpen.set(false);
   }
 
   setLanguage(language: SupportedLanguage) {
@@ -40,5 +43,9 @@ export class AppComponent {
 
   signOut() {
     void this.auth.signOut();
+  }
+
+  toggleMobileMenu() {
+    this.mobileMenuOpen.update((open) => !open);
   }
 }

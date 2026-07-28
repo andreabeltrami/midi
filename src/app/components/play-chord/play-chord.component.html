@@ -43,6 +43,13 @@
       }
     </h2>
 
+    @if (startingDegreeRuleEnabled() && currentStartingDegree(); as startingDegree) {
+      <p class="starting-degree-target">
+        {{ 'play.startingDegreeTarget' | t }}:
+        <strong>{{ ('play.startingDegrees.' + startingDegree) | t }}</strong>
+      </p>
+    }
+
     <div class="selection-container">
       <button class="reset-btn" (click)="resetPressedNotes()">
         <span class="icon">↺</span> {{ 'common.reset' | t }}
@@ -68,6 +75,43 @@
               ℹ️
             </button>
           </div>
+        </div>
+
+        <div class="starting-degree-settings">
+          <label class="rule-toggle">
+            <input
+              type="checkbox"
+              [checked]="startingDegreeRuleEnabled()"
+              (change)="toggleStartingDegreeRule($event)"
+              [disabled]="gameActive()" />
+            <span>{{ 'play.startingDegreeRule' | t }}</span>
+          </label>
+
+          <button
+            type="button"
+            class="starting-degree-menu-button"
+            (click)="toggleStartingDegreeMenu()"
+            [disabled]="gameActive()"
+            [attr.aria-expanded]="startingDegreeMenuOpen()"
+            [attr.aria-label]="'play.startingDegreeMenu' | t">
+            <span>{{ 'play.startingDegreeMenu' | t }}</span>
+            <span aria-hidden="true">▾</span>
+          </button>
+
+          @if (startingDegreeMenuOpen()) {
+            <div class="starting-degree-options" role="group" [attr.aria-label]="'play.startingDegreeMenu' | t">
+              @for (option of startingDegreeOptions; track option.key) {
+                <label>
+                  <input
+                    type="checkbox"
+                    [checked]="selectedStartingDegrees().includes(option.key)"
+                    (change)="toggleStartingDegree(option.key, $event)"
+                    [disabled]="gameActive() || !isStartingDegreeAvailable(option.key)" />
+                  <span>{{ option.labelKey | t }}</span>
+                </label>
+              }
+            </div>
+          }
         </div>
       </div>
     </div>
