@@ -34,6 +34,8 @@ export class RecognizeChordComponent implements OnDestroy {
     { label: '-7', value: ChordType.Minor7 },
     { label: '7', value: ChordType.Perfect7 },
     { label: 'Maj7', value: ChordType.Major7 },
+    { label: '°7', value: ChordType.Diminished7 },
+     { label: 'ø7', value: ChordType.HalfDiminished7 },
   ];
 
   currentChord = signal<ChordDefinition>(PlayChordComponent.generateRandomChord());
@@ -286,6 +288,8 @@ export class RecognizeChordComponent implements OnDestroy {
       [ChordType.Minor7]: '-7',
       [ChordType.Perfect7]: '7',
       [ChordType.Major7]: 'Maj7',
+      [ChordType.Diminished7]: '°7',
+      [ChordType.HalfDiminished7]: 'ø7',
     };
     const quality = qualityByChordType[chord.type] ?? '?';
     return `${noteName}${quality}`;

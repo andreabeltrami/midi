@@ -70,6 +70,8 @@ export class PlayDegreeComponent implements OnDestroy {
         [ChordType.Minor7]: '-7',
         [ChordType.Perfect7]: '7',
         [ChordType.Major7]: 'Maj7',
+        [ChordType.Diminished7]: '°7',
+        [ChordType.HalfDiminished7]: 'ø7',
       };
 
       const baseNoteLabel = chord.displayBaseNote ?? getNoteLabel(chord.baseNote);
@@ -354,6 +356,8 @@ export class PlayDegreeComponent implements OnDestroy {
         [ChordType.Minor7]: '-7',
         [ChordType.Perfect7]: '7',
         [ChordType.Major7]: 'Maj7',
+        [ChordType.Diminished7]: '7',
+        [ChordType.HalfDiminished7]: 'ø7',
       };
       const quality = qualityByChordType[chord.type] ?? '?';
       const degreeLabel = getDegreeLabel(degree);
@@ -548,7 +552,10 @@ export class PlayDegreeComponent implements OnDestroy {
     // Per la modalità accordo, il 3 e 7 variano in base al tipo di accordo
     if (this.playMode() === 'chord' && this.currentDegree() === ChordDegree.Three) {
       // 3 senza specifica: maggiore per accordi maggiori (7, Maj7), minore per accordi minori (-7)
-      if (this.currentChord().type === ChordType.Minor7) {
+      if (
+        this.currentChord().type === ChordType.Minor7 ||
+        this.currentChord().type === ChordType.HalfDiminished7
+      ) {
         expectedInterval = Interval.IIIm; // terza minore
       } else {
         expectedInterval = Interval.IIIM; // terza maggiore

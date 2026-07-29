@@ -74,6 +74,8 @@ export class PlayChordComponent implements OnDestroy {
       [ChordType.Minor7]: '-7',
       [ChordType.Perfect7]: '7',
       [ChordType.Major7]: 'Maj7',
+      [ChordType.Diminished7]: '°7',
+      [ChordType.HalfDiminished7]: 'ø7',
     };
 
     const baseNoteLabel = chord.displayBaseNote ?? getNoteLabel(chord.baseNote);
@@ -358,6 +360,8 @@ export class PlayChordComponent implements OnDestroy {
       [ChordType.Minor7]: '-7',
       [ChordType.Perfect7]: '7',
       [ChordType.Major7]: 'Maj7',
+      [ChordType.Diminished7]: '°7',
+      [ChordType.HalfDiminished7]: 'ø7',
     };
     const quality = qualityByChordType[chord.type] ?? '?';
     return `${noteName}${quality}`;

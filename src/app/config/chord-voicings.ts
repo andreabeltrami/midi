@@ -17,6 +17,12 @@ export const CHORD_VOICINGS: Record<ChordType, Partial<Record<VoicingStyle, read
 		[VoicingStyle.BillEvans]: [Interval.II, Interval.IIIM, Interval.V, Interval.VI],
 		[VoicingStyle.Base]: [Interval.I, Interval.IIIM, Interval.V, Interval.VIIM],
 	},
+	[ChordType.Diminished7]: {
+		[VoicingStyle.Base]: [Interval.I, Interval.IIIm, Interval.Vb, Interval.VI],
+	},
+	[ChordType.HalfDiminished7]: {
+		[VoicingStyle.Base]: [Interval.I, Interval.IIIm, Interval.Vb, Interval.VIIm],
+	},
 };
 
 export const getChordVoicingIntervals = (
