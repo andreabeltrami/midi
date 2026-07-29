@@ -14,6 +14,13 @@ import { GameRunRecord, GuessAttempt, InputSource } from '../../types/game-run-r
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { VoicingInfoComponent } from '../voicing-info/voicing-info.component';
 import { ResultsStoreService } from '../../services/results-store.service';
+import {
+  formatElapsedMs,
+  getChordLabel,
+  loadGameRunsFromStorage,
+  saveGameRunsToStorage,
+  sortGameRuns,
+} from '../../utils/game-run.utils';
 
 @Component({
   selector: 'app-recognize-chord',
@@ -41,7 +48,7 @@ export class RecognizeChordComponent implements OnDestroy {
   currentChord = signal<ChordDefinition>(PlayChordComponent.generateRandomChord());
   currentChordWrong = signal(false);
   currentChordCorrect = signal(false);
-  voicingStyle = signal<VoicingStyle>(VoicingStyle.Standard);
+  voicingStyle = signal<VoicingStyle>(VoicingStyle.Rootless);
   showVoicingInfo = signal(false);
 
   gameActive = signal(false);
@@ -85,13 +92,7 @@ export class RecognizeChordComponent implements OnDestroy {
   }
 
   public getElapsedLabel(seconds: number): string {
-    const minutes = Math.floor(seconds / 60)
-      .toString()
-      .padStart(2, '0');
-    const secondsPart = Math.floor(seconds % 60)
-      .toString()
-      .padStart(2, '0');
-    return `${minutes}:${secondsPart}`;
+    return formatElapsedMs(seconds * 1000);
   }
 
   public getElapsedLabelFromMs(milliseconds: number): string {
@@ -180,7 +181,7 @@ export class RecognizeChordComponent implements OnDestroy {
     if (matches) {
       if (this.gameActive()) {
         this.currentStreak.update((value) => value + 1);
-        this.recordSuccessfulAttempt(this.getChordLabel(this.currentChord()), 'manual');
+        this.recordSuccessfulAttempt(getChordLabel(this.currentChord()), 'manual');
       }
 
       this.currentChordCorrect.set(true);
@@ -270,37 +271,16 @@ export class RecognizeChordComponent implements OnDestroy {
     this.gameActive.set(false);
     this.stopTimer();
 
-    const updatedBoard = [...this.leaderboard(), newRecord].sort((first, second) => {
-      if (first.elapsedMs !== second.elapsedMs) {
-        return first.elapsedMs - second.elapsedMs;
-      }
-      return first.totalGuesses - second.totalGuesses;
-    });
+    const updatedBoard = sortGameRuns([...this.leaderboard(), newRecord]);
 
     this.leaderboard.set(updatedBoard);
     this.persistLeaderboard(updatedBoard);
     void this.resultsStore.save(newRecord).catch((error) => console.error(error));
   }
 
-  private getChordLabel(chord: ChordDefinition): string {
-    const noteName = chord.displayBaseNote ?? getNoteLabel(chord.baseNote);
-    const qualityByChordType: Record<ChordType, string> = {
-      [ChordType.Minor7]: '-7',
-      [ChordType.Perfect7]: '7',
-      [ChordType.Major7]: 'Maj7',
-      [ChordType.Diminished7]: '°7',
-      [ChordType.HalfDiminished7]: 'ø7',
-    };
-    const quality = qualityByChordType[chord.type] ?? '?';
-    return `${noteName}${quality}`;
-  }
-
   private persistLeaderboard(records: GameRunRecord[]) {
     try {
-      localStorage.setItem(
-        RecognizeChordComponent.LEADERBOARD_STORAGE_KEY,
-        JSON.stringify(records),
-      );
+      saveGameRunsToStorage(RecognizeChordComponent.LEADERBOARD_STORAGE_KEY, records);
     } catch (error) {
       console.error(error);
     }
@@ -308,44 +288,7 @@ export class RecognizeChordComponent implements OnDestroy {
 
   private loadLeaderboard() {
     try {
-      const rawValue = localStorage.getItem(RecognizeChordComponent.LEADERBOARD_STORAGE_KEY);
-      if (!rawValue) {
-        return;
-      }
-
-      const parsedValue = JSON.parse(rawValue) as GameRunRecord[];
-      if (!Array.isArray(parsedValue)) {
-        return;
-      }
-
-      const normalizedRecords: GameRunRecord[] = parsedValue
-        .filter(
-          (entry) =>
-            typeof entry.id === 'string' &&
-            typeof entry.completedAtIso === 'string' &&
-            typeof entry.elapsedMs === 'number' &&
-            typeof entry.totalGuesses === 'number' &&
-            typeof entry.wrongGuesses === 'number' &&
-            Array.isArray(entry.guessedChords),
-        )
-        .map((entry) => ({
-          ...entry,
-          voicingStyle: typeof entry.voicingStyle === 'string' ? entry.voicingStyle : 'Unknown',
-          gameType: entry.gameType === 'play' ? 'play' : 'recognize',
-          attempts: Array.isArray(entry.attempts) ? entry.attempts : [],
-          inputSource: entry.inputSource === 'midi' || entry.inputSource === 'manual' || entry.inputSource === 'mixed'
-            ? entry.inputSource
-            : 'unknown',
-        }));
-
-      this.leaderboard.set(
-        normalizedRecords.sort((first, second) => {
-          if (first.elapsedMs !== second.elapsedMs) {
-            return first.elapsedMs - second.elapsedMs;
-          }
-          return first.totalGuesses - second.totalGuesses;
-        }),
-      );
+      this.leaderboard.set(loadGameRunsFromStorage(RecognizeChordComponent.LEADERBOARD_STORAGE_KEY, 'recognize'));
     } catch (error) {
       console.error(error);
     }
