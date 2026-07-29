@@ -156,8 +156,8 @@
     "minor7": "Min7",
     "dominant7": "7",
     "major7": "Maj7",
-    "standard": {
-      "name": "Standard",
+    "rootless": {
+      "name": "Rootless",
       "summary": "Classic rootless voicing built around the 3rd and 7th."
     },
     "billEvans": {

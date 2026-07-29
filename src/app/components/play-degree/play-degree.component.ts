@@ -514,7 +514,7 @@ export class PlayDegreeComponent implements OnDestroy {
         expectedInterval = Interval.VIIm; // settima minore
       }
     } else {
-      // Usa il mapping standard per tutti gli altri gradi
+      // Usa il mapping rootless per tutti gli altri gradi
       expectedInterval = degreeToDegreeLabel[this.currentDegree()];
     }
 

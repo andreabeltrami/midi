@@ -5,6 +5,7 @@ import { VoicingStyle } from '../enums/voicing-style';
 export const CHORD_VOICINGS: Record<ChordType, Partial<Record<VoicingStyle, readonly Interval[]>>> = {
 	[ChordType.Minor7]: {
 		[VoicingStyle.Rootless]: [Interval.II, Interval.IIIm, Interval.V, Interval.VIIm],
+		[VoicingStyle.BillEvans]: [Interval.II, Interval.IIIm, Interval.V, Interval.VIIm],
 		[VoicingStyle.Base]: [Interval.I, Interval.IIIm, Interval.V, Interval.VIIm],
 	},
 	[ChordType.Perfect7]: {
@@ -30,5 +31,5 @@ export const getChordVoicingIntervals = (
 	voicingStyle: VoicingStyle
 ): readonly Interval[] | undefined => {
 	const voicingDefinitions = CHORD_VOICINGS[chordType];
-	return voicingDefinitions[voicingStyle] ?? voicingDefinitions[VoicingStyle.Rootless];
+	return voicingDefinitions[voicingStyle] ?? voicingDefinitions[VoicingStyle.Base];
 };

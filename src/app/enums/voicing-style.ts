@@ -1,6 +1,6 @@
 
 export enum VoicingStyle {
-	Rootless = 'Standard',
+	Rootless = 'Rootless',
 	BillEvans = 'Bill Evans (Rootless)',
 	Base = 'Base'
 }
@@ -16,7 +16,7 @@ export type VoicingGuideDefinition = {
 };
 
 export const VOICING_LABEL_KEYS: Record<VoicingStyle, string> = {
-	[VoicingStyle.Rootless]: 'voicing.standard.name',
+	[VoicingStyle.Rootless]: 'voicing.rootless.name',
 	[VoicingStyle.BillEvans]: 'voicing.billEvans.name',
 	[VoicingStyle.Base]: 'voicing.base.name',
 };
@@ -33,7 +33,7 @@ export const VOICING_GUIDES: readonly VoicingGuideDefinition[] = [
 	{
 		style: VoicingStyle.Rootless,
 		labelKey: VOICING_LABEL_KEYS[VoicingStyle.Rootless],
-		summaryKey: 'voicing.standard.summary',
+		summaryKey: 'voicing.rootless.summary',
 		chordFormulas: [
 			{ chordTypeKey: 'voicing.minor7', formula: '9 · ♭3 · 5 · ♭7' },
 			{ chordTypeKey: 'voicing.dominant7', formula: '9 · 3 · 5 · ♭7' },
