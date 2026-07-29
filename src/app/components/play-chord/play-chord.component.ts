@@ -17,6 +17,13 @@ import { VoicingInfoComponent } from '../voicing-info/voicing-info.component';
 import { MidiService } from '../../services/midi.service';
 import { Subscription } from 'rxjs';
 import { ResultsStoreService } from '../../services/results-store.service';
+import {
+  formatElapsedMs,
+  getChordLabel,
+  loadGameRunsFromStorage,
+  saveGameRunsToStorage,
+  sortGameRuns,
+} from '../../utils/game-run.utils';
 
 type StartingDegree = 'root' | 'ninth' | 'seventhSixth' | 'third' | 'fifthSixth';
 
@@ -36,7 +43,7 @@ export class PlayChordComponent implements OnDestroy {
   currentChord = signal<ChordDefinition>(PlayChordComponent.generateRandomChord());
   currentChordWrong = signal(false);
   currentChordCorrect = signal(false);
-  voicingStyle = signal<VoicingStyle>(VoicingStyle.Standard);
+  voicingStyle = signal<VoicingStyle>(VoicingStyle.Rootless);
   showVoicingInfo = signal(false);
   startingDegreeRuleEnabled = signal(false);
   startingDegreeMenuOpen = signal(false);
@@ -69,15 +76,7 @@ export class PlayChordComponent implements OnDestroy {
   currentChordString = computed(() => {
     const chord = this.currentChord();
     if (!chord) return '';
-
-    const qualityByChordType: Record<ChordType, string> = {
-      [ChordType.Minor7]: '-7',
-      [ChordType.Perfect7]: '7',
-      [ChordType.Major7]: 'Maj7',
-    };
-
-    const baseNoteLabel = chord.displayBaseNote ?? getNoteLabel(chord.baseNote);
-    return `${baseNoteLabel}${qualityByChordType[chord.type] ?? ''}`;
+    return getChordLabel(chord);
   });
 
   lastMidiEventType = MidiEventType.Released;
@@ -114,13 +113,7 @@ export class PlayChordComponent implements OnDestroy {
   }
 
   public getElapsedLabel(seconds: number): string {
-    const minutes = Math.floor(seconds / 60)
-      .toString()
-      .padStart(2, '0');
-    const secondsPart = Math.floor(seconds % 60)
-      .toString()
-      .padStart(2, '0');
-    return `${minutes}:${secondsPart}`;
+    return formatElapsedMs(seconds * 1000);
   }
 
   public getElapsedLabelFromMs(milliseconds: number): string {
@@ -284,7 +277,7 @@ export class PlayChordComponent implements OnDestroy {
     if (matches) {
       if (this.gameActive()) {
         this.currentStreak.update((value) => value + 1);
-        this.recordSuccessfulAttempt(this.getChordLabel(this.currentChord()), source);
+        this.recordSuccessfulAttempt(getChordLabel(this.currentChord()), source);
       }
 
       this.currentChordCorrect.set(true);
@@ -340,32 +333,16 @@ export class PlayChordComponent implements OnDestroy {
     this.gameActive.set(false);
     this.stopTimer();
 
-    const updatedBoard = [...this.leaderboard(), newRecord].sort((first, second) => {
-      if (first.elapsedMs !== second.elapsedMs) {
-        return first.elapsedMs - second.elapsedMs;
-      }
-      return first.totalGuesses - second.totalGuesses;
-    });
+    const updatedBoard = sortGameRuns([...this.leaderboard(), newRecord]);
 
     this.leaderboard.set(updatedBoard);
     this.persistLeaderboard(updatedBoard);
     void this.resultsStore.save(newRecord).catch((error) => console.error(error));
   }
 
-  private getChordLabel(chord: ChordDefinition): string {
-    const noteName = chord.displayBaseNote ?? getNoteLabel(chord.baseNote);
-    const qualityByChordType: Record<ChordType, string> = {
-      [ChordType.Minor7]: '-7',
-      [ChordType.Perfect7]: '7',
-      [ChordType.Major7]: 'Maj7',
-    };
-    const quality = qualityByChordType[chord.type] ?? '?';
-    return `${noteName}${quality}`;
-  }
-
   private persistLeaderboard(records: GameRunRecord[]) {
     try {
-      localStorage.setItem(PlayChordComponent.LEADERBOARD_STORAGE_KEY, JSON.stringify(records));
+      saveGameRunsToStorage(PlayChordComponent.LEADERBOARD_STORAGE_KEY, records);
     } catch (error) {
       console.error(error);
     }
@@ -373,44 +350,7 @@ export class PlayChordComponent implements OnDestroy {
 
   private loadLeaderboard() {
     try {
-      const rawValue = localStorage.getItem(PlayChordComponent.LEADERBOARD_STORAGE_KEY);
-      if (!rawValue) {
-        return;
-      }
-
-      const parsedValue = JSON.parse(rawValue) as GameRunRecord[];
-      if (!Array.isArray(parsedValue)) {
-        return;
-      }
-
-      const normalizedRecords: GameRunRecord[] = parsedValue
-        .filter(
-          (entry) =>
-            typeof entry.id === 'string' &&
-            typeof entry.completedAtIso === 'string' &&
-            typeof entry.elapsedMs === 'number' &&
-            typeof entry.totalGuesses === 'number' &&
-            typeof entry.wrongGuesses === 'number' &&
-            Array.isArray(entry.guessedChords),
-        )
-        .map((entry) => ({
-          ...entry,
-          voicingStyle: typeof entry.voicingStyle === 'string' ? entry.voicingStyle : 'Unknown',
-          gameType: entry.gameType === 'recognize' ? 'recognize' : 'play',
-          attempts: Array.isArray(entry.attempts) ? entry.attempts : [],
-          inputSource: entry.inputSource === 'midi' || entry.inputSource === 'manual' || entry.inputSource === 'mixed'
-            ? entry.inputSource
-            : 'unknown',
-        }));
-
-      this.leaderboard.set(
-        normalizedRecords.sort((first, second) => {
-          if (first.elapsedMs !== second.elapsedMs) {
-            return first.elapsedMs - second.elapsedMs;
-          }
-          return first.totalGuesses - second.totalGuesses;
-        }),
-      );
+      this.leaderboard.set(loadGameRunsFromStorage(PlayChordComponent.LEADERBOARD_STORAGE_KEY, 'play'));
     } catch (error) {
       console.error(error);
     }

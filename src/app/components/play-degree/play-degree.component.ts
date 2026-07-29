@@ -18,6 +18,13 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 import { MidiService } from '../../services/midi.service';
 import { Subscription } from 'rxjs';
 import { ResultsStoreService } from '../../services/results-store.service';
+import {
+  formatElapsedMs,
+  getChordQualityLabel,
+  loadGameRunsFromStorage,
+  saveGameRunsToStorage,
+  sortGameRuns,
+} from '../../utils/game-run.utils';
 
 @Component({
   selector: 'app-play-degree',
@@ -66,14 +73,8 @@ export class PlayDegreeComponent implements OnDestroy {
       const chord = this.currentChord();
       if (!chord) return '';
 
-      const qualityByChordType: Record<ChordType, string> = {
-        [ChordType.Minor7]: '-7',
-        [ChordType.Perfect7]: '7',
-        [ChordType.Major7]: 'Maj7',
-      };
-
       const baseNoteLabel = chord.displayBaseNote ?? getNoteLabel(chord.baseNote);
-      return `${baseNoteLabel}${qualityByChordType[chord.type] ?? ''}`;
+      return `${baseNoteLabel}${getChordQualityLabel(chord.type)}`;
     } else if (this.playMode() === 'major') {
       // Scala Maggiore: mostra solo la nota
       const baseNote = this.currentChord();
@@ -124,13 +125,7 @@ export class PlayDegreeComponent implements OnDestroy {
   }
 
   public getElapsedLabel(seconds: number): string {
-    const minutes = Math.floor(seconds / 60)
-      .toString()
-      .padStart(2, '0');
-    const secondsPart = Math.floor(seconds % 60)
-      .toString()
-      .padStart(2, '0');
-    return `${minutes}:${secondsPart}`;
+    return formatElapsedMs(seconds * 1000);
   }
 
   public getElapsedLabelFromMs(milliseconds: number): string {
@@ -330,12 +325,7 @@ export class PlayDegreeComponent implements OnDestroy {
 
     const [getBoard, setBoard] = leaderboardMap[this.playMode()];
     const currentBoard = getBoard();
-    const updatedBoard = [...currentBoard, newRecord].sort((first, second) => {
-      if (first.elapsedMs !== second.elapsedMs) {
-        return first.elapsedMs - second.elapsedMs;
-      }
-      return first.totalGuesses - second.totalGuesses;
-    });
+    const updatedBoard = sortGameRuns([...currentBoard, newRecord]);
 
     setBoard(updatedBoard);
     this.persistLeaderboard(updatedBoard, this.playMode());
@@ -350,12 +340,7 @@ export class PlayDegreeComponent implements OnDestroy {
       return `${baseNoteLabel} ${getScaleLabel(scale)} (${degreeLabel})`;
     } else {
       const noteName = chord.displayBaseNote ?? getNoteLabel(chord.baseNote);
-      const qualityByChordType: Record<ChordType, string> = {
-        [ChordType.Minor7]: '-7',
-        [ChordType.Perfect7]: '7',
-        [ChordType.Major7]: 'Maj7',
-      };
-      const quality = qualityByChordType[chord.type] ?? '?';
+      const quality = getChordQualityLabel(chord.type);
       const degreeLabel = getDegreeLabel(degree);
       return `${noteName}${quality} (${degreeLabel})`;
     }
@@ -368,7 +353,7 @@ export class PlayDegreeComponent implements OnDestroy {
         major: PlayDegreeComponent.LEADERBOARD_STORAGE_KEY_MAJOR,
         modes: PlayDegreeComponent.LEADERBOARD_STORAGE_KEY_MODES,
       };
-      localStorage.setItem(keyMap[mode], JSON.stringify(records));
+      saveGameRunsToStorage(keyMap[mode], records);
     } catch (error) {
       console.error(error);
     }
@@ -387,42 +372,7 @@ export class PlayDegreeComponent implements OnDestroy {
         major: PlayDegreeComponent.LEADERBOARD_STORAGE_KEY_MAJOR,
         modes: PlayDegreeComponent.LEADERBOARD_STORAGE_KEY_MODES,
       };
-      const rawValue = localStorage.getItem(keyMap[mode]);
-      if (!rawValue) {
-        return [];
-      }
-
-      const parsedValue = JSON.parse(rawValue) as GameRunRecord[];
-      if (!Array.isArray(parsedValue)) {
-        return [];
-      }
-
-      const normalizedRecords: GameRunRecord[] = parsedValue
-        .filter(
-          (entry) =>
-            typeof entry.id === 'string' &&
-            typeof entry.completedAtIso === 'string' &&
-            typeof entry.elapsedMs === 'number' &&
-            typeof entry.totalGuesses === 'number' &&
-            typeof entry.wrongGuesses === 'number' &&
-            Array.isArray(entry.guessedChords),
-        )
-        .map((entry) => ({
-          ...entry,
-          voicingStyle: typeof entry.voicingStyle === 'string' ? entry.voicingStyle : 'Unknown',
-          gameType: 'degree',
-          attempts: Array.isArray(entry.attempts) ? entry.attempts : [],
-          inputSource: entry.inputSource === 'midi' || entry.inputSource === 'manual' || entry.inputSource === 'mixed'
-            ? entry.inputSource
-            : 'unknown',
-        }));
-
-      return normalizedRecords.sort((first, second) => {
-        if (first.elapsedMs !== second.elapsedMs) {
-          return first.elapsedMs - second.elapsedMs;
-        }
-        return first.totalGuesses - second.totalGuesses;
-      });
+      return loadGameRunsFromStorage(keyMap[mode], 'degree');
     } catch (error) {
       console.error(error);
       return [];
@@ -548,7 +498,10 @@ export class PlayDegreeComponent implements OnDestroy {
     // Per la modalità accordo, il 3 e 7 variano in base al tipo di accordo
     if (this.playMode() === 'chord' && this.currentDegree() === ChordDegree.Three) {
       // 3 senza specifica: maggiore per accordi maggiori (7, Maj7), minore per accordi minori (-7)
-      if (this.currentChord().type === ChordType.Minor7) {
+      if (
+        this.currentChord().type === ChordType.Minor7 ||
+        this.currentChord().type === ChordType.HalfDiminished7
+      ) {
         expectedInterval = Interval.IIIm; // terza minore
       } else {
         expectedInterval = Interval.IIIM; // terza maggiore
@@ -561,7 +514,7 @@ export class PlayDegreeComponent implements OnDestroy {
         expectedInterval = Interval.VIIm; // settima minore
       }
     } else {
-      // Usa il mapping standard per tutti gli altri gradi
+      // Usa il mapping rootless per tutti gli altri gradi
       expectedInterval = degreeToDegreeLabel[this.currentDegree()];
     }
 

@@ -3,9 +3,10 @@ import type { User } from 'firebase/auth';
 import { getVoicingLabelKey } from '../../enums/voicing-style';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { I18nService } from '../../services/i18n.service';
-import { GameRunRecord, GuessAttempt, InputSource, TrainerGameType } from '../../types/game-run-record';
+import { GameRunRecord, InputSource, TrainerGameType } from '../../types/game-run-record';
 import { ResultsStoreService } from '../../services/results-store.service';
 import { AuthService } from '../../services/auth.service';
+import { loadGameRunsFromStorage, normalizeGameRun, sortGameRuns } from '../../utils/game-run.utils';
 
 type SortField =
   | 'completedAtIso'
@@ -217,8 +218,7 @@ export class ResultTableComponent {
 
   private loadFromStorage(): GameRunRecord[] {
     try {
-      return STORAGE_KEYS.flatMap(([gameType, storageKey]) => this.loadBoard(storageKey, gameType))
-        .sort((a, b) => (a.elapsedMs !== b.elapsedMs ? a.elapsedMs - b.elapsedMs : a.totalGuesses - b.totalGuesses));
+      return sortGameRuns(STORAGE_KEYS.flatMap(([gameType, storageKey]) => loadGameRunsFromStorage(storageKey, gameType)));
     } catch {
       return [];
     }
@@ -232,79 +232,12 @@ export class ResultTableComponent {
 
     try {
       const remoteRecords = (await this.resultsStore.load()).map((record) => {
-        const inputSource: InputSource =
-          record.inputSource === 'midi' || record.inputSource === 'manual' || record.inputSource === 'mixed'
-            ? record.inputSource
-            : 'unknown';
-
-        return {
-          ...record,
-          guessedChords: Array.isArray(record.guessedChords) ? record.guessedChords : [],
-          attempts: this.normalizeAttempts(record.attempts, inputSource),
-          inputSource,
-        };
-      });
+        return normalizeGameRun(record, record.gameType);
+      }).filter((record): record is GameRunRecord => record !== null);
       this.records.set(remoteRecords.sort((a, b) => b.completedAtIso.localeCompare(a.completedAtIso)));
     } catch (error) {
       console.error(error);
     }
-  }
-
-  private loadBoard(storageKey: string, gameType: TrainerGameType): GameRunRecord[] {
-    const raw = localStorage.getItem(storageKey);
-    if (!raw) {
-      return [];
-    }
-
-    const parsed = JSON.parse(raw) as Partial<GameRunRecord>[];
-    if (!Array.isArray(parsed)) {
-      return [];
-    }
-
-    return parsed
-      .filter(
-        (entry) =>
-          typeof entry.id === 'string' &&
-          typeof entry.completedAtIso === 'string' &&
-          typeof entry.elapsedMs === 'number' &&
-          typeof entry.totalGuesses === 'number' &&
-          typeof entry.wrongGuesses === 'number' &&
-          Array.isArray(entry.guessedChords),
-      )
-      .map((entry) => ({
-        id: entry.id as string,
-        completedAtIso: entry.completedAtIso as string,
-        elapsedMs: entry.elapsedMs as number,
-        totalGuesses: entry.totalGuesses as number,
-        wrongGuesses: entry.wrongGuesses as number,
-        voicingStyle: typeof entry.voicingStyle === 'string' ? entry.voicingStyle : 'Unknown',
-        guessedChords: [...(entry.guessedChords as string[])],
-        attempts: this.normalizeAttempts(entry.attempts, typeof entry.inputSource === 'string' ? entry.inputSource as InputSource : 'unknown'),
-        inputSource: entry.inputSource === 'midi' || entry.inputSource === 'manual' || entry.inputSource === 'mixed'
-          ? entry.inputSource
-          : 'unknown',
-        gameType: entry.gameType === 'play' || entry.gameType === 'recognize' ? entry.gameType : gameType,
-      }));
-  }
-
-  private normalizeAttempts(value: unknown, fallbackSource: InputSource): GuessAttempt[] {
-    if (!Array.isArray(value)) {
-      return [];
-    }
-
-    return value.filter(
-      (attempt): attempt is GuessAttempt =>
-        !!attempt &&
-        typeof attempt === 'object' &&
-        typeof (attempt as GuessAttempt).target === 'string' &&
-        typeof (attempt as GuessAttempt).elapsedMs === 'number' &&
-        typeof (attempt as GuessAttempt).wrongGuesses === 'number',
-    ).map((attempt) => ({
-      ...attempt,
-      inputSource: attempt.inputSource === 'midi' || attempt.inputSource === 'manual' || attempt.inputSource === 'mixed' || attempt.inputSource === 'unknown'
-        ? attempt.inputSource
-        : fallbackSource,
-    }));
   }
 
   private getSortValue(record: GameRunRecord, field: SortField): number | string {
