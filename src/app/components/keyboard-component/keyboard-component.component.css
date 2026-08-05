@@ -26,6 +26,7 @@
 
 .key{
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 .white-key {
